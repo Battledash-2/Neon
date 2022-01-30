@@ -22,6 +22,7 @@ const tests = [
 	require('./objects'),
 	require('./object-set'),
 	require('./arrays'),
+	require('./conditional'),
 ];
 
 const manualTests = [

@@ -1,5 +1,9 @@
 const testCode = `
-['poop'][1] = 'peep'
+if (38 >= 32) {
+	print("E")
+} else {
+	print("A");
+}
 `; // 1+1-3
 
 const Lexer = require('./lexer');

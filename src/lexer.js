@@ -7,6 +7,7 @@ const spec = [
 	// ---------------------------
 	// Math
 	[/^[\+\-\*\/\^]/, "OPERATOR"],
+	[/^(==|<=|>=|<|>|!=|\|\||&&)/, "CONDITION_OPERATOR"],
 	[/^[\=]/, "ASSIGNMENT"],
 
 	[/^\(/, 'LPAREN'],
@@ -23,6 +24,8 @@ const spec = [
 	// ---------------------------
 	// Keywords
 	// -- Variables:
+	[/^if\b/, "CONDITIONAL"],
+	[/^else\b/, "CONDITIONAL_ELSE"],
 	[/^(var|let)\b/, "DEFINE"],
 	[/^\bfun\b/, "F_DEFINE"],
 	

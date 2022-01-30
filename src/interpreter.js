@@ -20,6 +20,7 @@ class Interpreter {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
 		if (this._isNumber(exp)) return exp;
+		if (Array.isArray(exp)) return exp;
 
 		// Type related stuff:
 		if (isTypeof('NUMBER')) {
@@ -128,6 +129,22 @@ class Interpreter {
 			return func;
 		}
 
+		// ----------------------
+		// Conditional
+
+		// Handle
+		if (isTypeof('LOGICAL')) {
+			return this.handleLogicalExpression(exp, env);
+		}
+		// IF-Statements
+		if (isTypeof('CONDITION')) {
+			if (this.eval(exp.statement)) {
+				return this.evalBlock(exp.pass, env);
+			} else {
+				return this.evalBlock(exp.fail, env);
+			}
+		}
+
 		// Block
 		if (isTypeof('BLOCK')) {
 			return this.evalBlock(exp?.body, env);
@@ -195,6 +212,30 @@ class Interpreter {
 		}
 	}
 
+	handleLogicalExpression(exp, env) {
+		let left = this.eval(exp?.left, env);
+		let right = this.eval(exp?.right, env);
+
+		switch (exp?.operator) {
+			case '==':
+				return left === right;
+			case '!=':
+				return left !== right;
+			case '&&':
+				return left && right;
+			case '||':
+				return left || right;
+			case '<':
+				return left < right;
+			case '>':
+				return left > right;
+			case '<=':
+				return left <= right;
+			case '>=':
+				return left >= right;
+		}
+	}
+
 	_isNumber(exp) {
 		return typeof exp === 'number';
 	}
@@ -203,6 +244,9 @@ class Interpreter {
 const GlobalEnvironment = new Environment({
 	VER: '1.0.0',
 	OS: process.platform,
+
+	true: true,
+	false: false,
 	
 	// Native functions
 	print(...args) { console.log(...args); return args.join(" "); },

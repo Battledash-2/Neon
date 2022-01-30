@@ -49,8 +49,55 @@ module.exports = class Parser {
 		return this.primaryStatement();
 	}
 
+	// logicalMOREEQ() {
+	// 	return this.logicalExpression('unary', '>=');
+	// }
+
+	// logicalMORE() {
+	// 	return this.logicalExpression('logicalMOREEQ', '>');
+	// }
+
+	// logicalLESSEQ() {
+	// 	return this.logicalExpression('logicalMORE', '<=');
+	// }
+
+	// logicalLESS() {
+	// 	return this.logicalExpression('logicalLESSEQ', '<');
+	// }
+
+	// logicalEQUAL() {
+	// 	return this.logicalExpression('logicalLESS', '==');
+	// }
+
+	// logicalNOT() {
+	// 	return this.logicalExpression('logicalEQUAL', '!=');
+	// }
+
+	// logicalAND() {
+	// 	return this.logicalExpression('logicalNOT', '&&');
+	// }
+
+	logicalExpression() {
+		let left = this.unary();
+
+		while (this.next?.type === 'CONDITION_OPERATOR') {
+			let operator = this.next.value;
+			this.advance('CONDITION_OPERATOR');
+			let right = this.unary();
+
+			left = {
+				type: 'LOGICAL',
+				operator,
+				left,
+				right
+			}
+		}
+
+		return left;
+	}
+
 	variableExpression() {
-		if (this.next?.type !== 'DEFINE') return this.unary();
+		if (this.next?.type !== 'DEFINE') return this.logical();
 		
 		this.advance('DEFINE');
 		let name = this.next;
@@ -284,6 +331,37 @@ module.exports = class Parser {
 		});
 	}
 
+	logical() {
+		return this.logicalExpression();
+	}
+
+	condition() {
+		this.advance('LPAREN');
+		let statement = this.logical();
+		this.advance('RPAREN');
+
+		let pass = this.blockStatement();
+		let fail;
+
+		if (this.next?.type === 'CONDITIONAL_ELSE') {
+			this.advance('CONDITIONAL_ELSE');
+			fail = this.blockStatement();
+		}
+
+		return {
+			type: 'CONDITION',
+			statement,
+			pass,
+			fail,
+		};
+	}
+
+	conditionalStatement() {
+		this.advance('CONDITIONAL');
+		const condition = this.condition();
+		return condition;
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -305,6 +383,8 @@ module.exports = class Parser {
 				return this.functionDefinition();
 			case 'LBRACK':
 				return this.arrayStatement();
+			case 'CONDITIONAL':
+				return this.conditionalStatement();
 			default:
 				const r = this.next;
 				this.advance();
@@ -314,14 +394,6 @@ module.exports = class Parser {
 
 	statement() {
 		return this.additionExpression();
-		// switch (this.next?.type) {
-		//	 case 'NUMBER':
-				
-		//	 case 'OPERATOR':
-		//		 return this.unary();
-		//	 default:
-		//		 return this.primaryStatement();
-		// }
 	}
 
 	statementList(endOn) {
