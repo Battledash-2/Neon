@@ -218,6 +218,34 @@ module.exports = class Parser {
 		};
 	}
 
+	objectStatement() {
+		this.advance('LBLOCK');
+		
+		let obj = {};
+
+		// hello: hey
+		do {
+			if (this.next?.type === 'RBLOCK') break;
+			let name = this.next;
+			
+			if (this.next?.type !== 'IDENTIFIER' && this.next?.type !== 'STRING') throw new TypeError(`Value type is expected to be a string or identifier`);
+			if (this.next?.type === 'STRING') name.value = StringHandle(name.value.slice(1, -1));
+
+			this.advance();
+			this.advance('OBJ_SET');
+
+			let value = this.statement();
+
+			obj[name?.value] = value;
+		} while (this.next?.type === 'SEPERATOR' && this.advance('SEPERATOR', ',')); // OBJ_SEPERATOR && OBJ_SET
+
+		this.advance('RBLOCK');
+		return {
+			type: 'OBJECT',
+			values: obj,
+		}
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -228,7 +256,7 @@ module.exports = class Parser {
 			case 'STRING':
 				return this.stringStatement();
 			case 'LBLOCK':
-				return this.blockStatement();
+				return this.objectStatement();
 			case 'LPAREN':
 				return this.parenthesizedExpression();
 			case 'OPERATOR':

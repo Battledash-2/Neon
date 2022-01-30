@@ -53,16 +53,32 @@ class Interpreter {
 			return env.assign(exp?.name?.value, this.eval(exp?.value, env));
 		}
 
+		// Objects
+		if (isTypeof('OBJECT')) {
+			let objEnv = {};
+		
+			for (let name in exp.values) {
+				objEnv[name] = this.eval(exp.values[name], env);
+			}
+
+			return new Environment(objEnv, env);
+		}
+
 		// Linked
 		if (isTypeof('LINKED')) {
 			let to = this.eval(exp.with, env);
+
 			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to);
 			if (exp.with?.type === 'NUMBER' || typeof to === 'number') to = Constructors.Number(to);
 			
 			if (exp.other?.type === 'FUNCTION_CALL') {
 				return this.callFunc(exp.other, to);
 			}
-			return to.lookup(exp.other?.value);
+
+			// console.log(this.eval(exp.other, to), exp.other)
+			let lookup = exp.other?.type === 'IDENTIFIER' ? to.lookup(exp.other?.value) : this.eval(exp.other, to);
+			
+			return lookup;
 		}
 
 		// ------------------------

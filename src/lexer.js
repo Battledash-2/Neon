@@ -31,6 +31,7 @@ const spec = [
 
 	[/^,/, 'SEPERATOR'],
 	[/^\./, 'OBJ_SEPERATOR'],
+	[/^\:/, 'OBJ_SET'],
 
 	// ---------------------------
 	// Line ends
