@@ -20,6 +20,7 @@ const tests = [
     require('./variable-assign'),
     require('./linked'),
 	require('./objects'),
+	require('./object-set'),
 ];
 const manualTests = [
     23
