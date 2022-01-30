@@ -75,6 +75,7 @@ module.exports = class Parser {
 	variableExpression() {
 		if (this.next?.type !== 'DEFINE') return this.logical();
 		
+		let kind = this.next.value;
 		this.advance('DEFINE');
 		let name = this.next;
 		this.advance('IDENTIFIER');
@@ -87,6 +88,7 @@ module.exports = class Parser {
 				type: 'DEFINE',
 				name,
 				value,
+				kind,
 				position: name?.position,
 			}
 		}

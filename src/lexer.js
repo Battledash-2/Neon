@@ -27,7 +27,7 @@ const spec = [
 	// -- Variables:
 	[/^if\b/, "CONDITIONAL"],
 	[/^else\b/, "CONDITIONAL_ELSE"],
-	[/^(var|let)\b/, "DEFINE"],
+	[/^(var|let|const)\b/, "DEFINE"],
 	[/^(for|while)\b/, "LOOP"],
 	[/^\bfun\b/, "F_DEFINE"],
 	
@@ -52,7 +52,7 @@ module.exports = class Lexer {
 		this.cursor = 0;
 
 		// for error logging
-		this.line = 1;
+		this.line = 0;
 		this.pos = 1;
 		this.filename = filename;
 	}

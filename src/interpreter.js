@@ -71,7 +71,7 @@ class Interpreter {
 		
 		// Define
 		if (isTypeof('DEFINE')) {
-			return env.define(exp?.name?.value, this.eval(exp?.value, env), this.pos);
+			return env.define(exp?.name?.value, this.eval(exp?.value, env), this.pos, exp?.kind === 'const' ? true : false);
 		}
 		// Assign
 		if (isTypeof('ASSIGN')) {
@@ -324,15 +324,15 @@ class Interpreter {
 }
 
 const GlobalEnvironment = new Environment({
-	VER: '1.0.0',
-	OS: process.platform,
+	VER: '1.0.0', // { constant: false, value: '1.0.0', },
+	OS: process.platform, // { constant: true, value: process.platform, },
 
-	true: true,
-	false: false,
+	true: true, // { constant: true, value: true, },
+	false: false, // { constant: true, value: false, },
 	
 	// Native functions
 	print(...args) { console.log(...args); return args.join(" "); },
-	isNaN(arg) {return isNaN(arg);}
+	isNaN(arg) { return isNaN(arg); }
 });
 
 module.exports = Interpreter;

@@ -29,6 +29,7 @@ const tests = [
 	require('./nested-functions'),
 	require('./unary'),
 	require('./object-test'),
+	require('./constants'),
 ];
 
 const manualTests = [
