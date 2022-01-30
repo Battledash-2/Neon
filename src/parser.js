@@ -1,4 +1,4 @@
-const StringHandle = require('./escapes');
+const StringHandle = require('./core/escapes');
 
 module.exports = class Parser {
 	constructor(tokens, filename='runtime') {

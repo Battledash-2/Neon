@@ -1,4 +1,4 @@
-const Environment = require('./environment');
+const Environment = require('../environment');
 
 const math = new Environment({
 	PI: Math.PI,

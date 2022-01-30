@@ -323,6 +323,6 @@ class Interpreter {
 	}
 }
 
-const GlobalEnvironment = require('./global');
+const GlobalEnvironment = require('./core/global');
 
 module.exports = Interpreter;
