@@ -1,0 +1,25 @@
+{
+  "name": "neonlang",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "node ./tests/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Battlealt/NeonLang.git"
+  },
+  "keywords": [
+    "neon",
+    "language",
+    "lang",
+    "node"
+  ],
+  "author": "Battledash-2",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Battlealt/NeonLang/issues"
+  },
+  "homepage": "https://github.com/Battlealt/NeonLang#readme"
+}
