@@ -19,8 +19,10 @@ module.exports = test => {
 	`, 55);
 
 	test(`
-	let array = [32, 19]
-	array.push(5)
+	let array = [32, 19];
+	array.push(5);
+	print(array); // [32, 19, 5]
+	array.splice(1, 1); // remove '19' ([32, 5])
 	print(array);
-	`, "32,19,5")
+	`, "32,5")
 }
