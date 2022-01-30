@@ -4,6 +4,7 @@ module.exports = test => {
     `, 43);
 
     test(`
-        "43".someFunction('hello');
-    `, 'hello');
+        let str = "43";
+		str.number
+    `, 43);
 }
