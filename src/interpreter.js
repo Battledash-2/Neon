@@ -42,7 +42,7 @@ class Interpreter {
 		if (Array.isArray(exp)) return exp;
 
 		this.pos = {
-			...exp.position,
+			...exp?.position ?? {line: 1, cursor: 1},
 			filename: this.filename,
 		};
 
