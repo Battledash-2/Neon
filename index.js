@@ -1,5 +1,5 @@
 const testCode = `
-let pop = 'poop'
+hello.sdjhi
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');

@@ -29,6 +29,8 @@ const spec = [
 	[/^else\b/, "CONDITIONAL_ELSE"],
 	[/^(var|let|const)\b/, "DEFINE"],
 	[/^(for|while)\b/, "LOOP"],
+	[/^\bimport\b/, "IMPORT"],
+	[/^\bexport\b/, "EXPORT"],
 	[/^\bfun\b/, "F_DEFINE"],
 	
 	// ---------------------------

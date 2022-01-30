@@ -1,3 +1,7 @@
+const fs = require('fs');
+const path = require('path');
+const Lexer = require('./lexer');
+const Parser = require('./parser');
 const Environment = require('./environment');
 
 const Constructors = {
@@ -33,8 +37,9 @@ const Constructors = {
 class Interpreter {
 	constructor(filename='runtime') {
 		this.filename = filename;
+		this.exports = {};
 	}
-	eval(exp, env=GlobalEnvironment) {
+	eval(exp, env=GlobalEnvironment, exportMode=false) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
 		if (typeof exp === 'number') return exp;
@@ -42,7 +47,7 @@ class Interpreter {
 		if (Array.isArray(exp)) return exp;
 
 		this.pos = {
-			...exp?.position ?? {line: 1, cursor: 1},
+			...(exp?.position ?? {line: 1, cursor: 1}),
 			filename: this.filename,
 		};
 
@@ -121,7 +126,7 @@ class Interpreter {
 				objEnv[name] = this.eval(exp.values[name], env);
 			}
 
-			return new Environment(objEnv, env);
+			return new Environment(objEnv);
 		}
 
 		// Linked
@@ -137,7 +142,7 @@ class Interpreter {
 				return this.callFunc(exp.other, fenv);
 			}
 
-			let lookup = exp.other?.type === 'IDENTIFIER' ? to.lookup(exp.other?.value) : this.eval(exp.other, to);
+			let lookup = exp.other?.type === 'IDENTIFIER' ? to.nonInheritedlookup(exp.other?.value) : this.eval(exp.other, to);
 			
 			return lookup;
 		}
@@ -198,6 +203,16 @@ class Interpreter {
 			return res;
 		}
 
+		// Imports
+		if (isTypeof('IMPORT')) {
+			throw 'unimplemented';
+		}
+
+		// Export
+		if (isTypeof('EXPORT')) {
+			throw 'unimplemented';
+		}
+
 		// Block
 		if (isTypeof('BLOCK')) {
 			return this.evalBlock(exp?.body, env);
@@ -207,6 +222,7 @@ class Interpreter {
 			exp.body.forEach(item=>{
 				res = this.eval(item, env);
 			});
+			if (exportMode) return this.exports;
 			return res;
 		}
 

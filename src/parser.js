@@ -14,7 +14,8 @@ module.exports = class Parser {
 		let s = this.next;
 		s = {
 			type: 'STRING',
-			value: StringHandle(s.value.slice(1, -1))
+			value: StringHandle(s.value.slice(1, -1)),
+			position: s.position,
 		};
 		this.advance('STRING');
 		if (this.next?.type === 'OBJ_SEPERATOR') {
@@ -406,6 +407,30 @@ module.exports = class Parser {
 		};
 	}
 
+	importStatement() {
+		const pos = this.next.position;
+		this.advance('IMPORT', 'import');
+		const file = this.stringStatement();
+
+		return {
+			type: 'IMPORT',
+			file,
+			position: pos,
+		}
+	}
+
+	exportStatement() {
+		let pos = this.next.position;
+		this.advance('EXPORT');
+		let value = this.primaryStatement();
+
+		return {
+			type: 'EXPORT',
+			value,
+			position: pos,
+		}
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -431,6 +456,10 @@ module.exports = class Parser {
 				return this.conditionalStatement();
 			case 'LOOP':
 				return this.loopStatement();
+			case 'IMPORT':
+				return this.importStatement();
+			case 'EXPORT':
+				return this.exportStatement();
 			default:
 				const r = this.next;
 				this.advance();
@@ -464,7 +493,7 @@ module.exports = class Parser {
 		lk = lk ?? type;
 		if (type != null) {
 			if (this.next == null) throw new SyntaxError(`Input abruptly ended while expecting '${lk}' (${this.filename}:EOF)`);
-			if (this.next.type !== type) throw new SyntaxError(`Unexpected token '${this.next.value}': Expected '${lk}' (${this.filename}:${this.next.line}:${this.next.cursor}`);
+			if (this.next.type !== type) throw new SyntaxError(`Unexpected token '${this.next.value}': Expected '${lk}' (${this.filename}:${this.next.position.line}:${this.next.position.cursor})`);
 		}
 
 		this.next = this.tokens.nextToken();

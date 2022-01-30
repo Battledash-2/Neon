@@ -22,6 +22,11 @@ class Environment {
 		return this.resolve(name, pos).record[name];
     }
 
+	nonInheritedlookup(name, pos) {
+		if (!this.record.hasOwnProperty(name)) throw new ReferenceError(`Could not resolve variable '${name}' (${pos.filename}:${pos.line}:${pos.cursor})`);
+		return this.record[name];
+	}
+
 	isConstant(name, pos) {
 		let env = this.resolve(name, pos);
 		if (env.constants.hasOwnProperty(name)) {return true;}
