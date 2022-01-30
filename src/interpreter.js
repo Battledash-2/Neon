@@ -323,16 +323,6 @@ class Interpreter {
 	}
 }
 
-const GlobalEnvironment = new Environment({
-	VER: '1.0.0', // { constant: false, value: '1.0.0', },
-	OS: process.platform, // { constant: true, value: process.platform, },
-
-	true: true, // { constant: true, value: true, },
-	false: false, // { constant: true, value: false, },
-	
-	// Native functions
-	print(...args) { console.log(...args); return args.join(" "); },
-	isNaN(arg) { return isNaN(arg); }
-});
+const GlobalEnvironment = require('./global');
 
 module.exports = Interpreter;

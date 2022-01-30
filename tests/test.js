@@ -30,6 +30,7 @@ const tests = [
 	require('./unary'),
 	require('./object-test'),
 	require('./constants'),
+	require('./math-test'),
 ];
 
 const manualTests = [
