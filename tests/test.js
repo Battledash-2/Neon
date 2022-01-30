@@ -25,6 +25,7 @@ const tests = [
 	require('./conditional'),
 	require('./loops'),
 	require('./assignments'),
+	require('./string'),
 ];
 
 const manualTests = [

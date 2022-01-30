@@ -5,6 +5,10 @@ const Constructors = {
 		return new Environment({
 			value: THIS,
 			number: Number(THIS),
+			substring(from, to) {return THIS.slice(from, to);},
+			split(txt) {return THIS.split(txt);},
+
+			match(txt) {return THIS.match(new RegExp(txt, 'g'));}
 		});
 	},
 	Number(THIS) {
@@ -19,7 +23,8 @@ class Interpreter {
 	eval(exp, env=GlobalEnvironment) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
-		if (this._isNumber(exp)) return exp;
+		if (typeof exp === 'number') return exp;
+		if (typeof exp === 'string') return exp;
 		if (Array.isArray(exp)) return exp;
 
 		// Type related stuff:
@@ -82,8 +87,7 @@ class Interpreter {
 		if (isTypeof('ARRAY_SELECT')) {
 			let arr = this.eval(exp.array, env);
 			let to = this.eval(exp.select, env);
-
-			return arr[to];
+			return arr.record ? arr.record[to] : arr[to];
 		}
 
 		// Objects
