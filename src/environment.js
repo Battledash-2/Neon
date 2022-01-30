@@ -27,6 +27,13 @@ class Environment {
 		if (env.constants.hasOwnProperty(name)) {return true;}
 	}
 
+	varExists(name) {
+		if (this.record.hasOwnProperty(name)) return true;
+		if (this.parent == null) return false;
+
+		return this.parent.varExists(name);
+	}
+
     resolve(name, pos) {
         if (this.record.hasOwnProperty(name)) return this;
         if (this.parent == null) throw new ReferenceError(`Could not resolve variable '${name}' (${pos.filename}:${pos.line}:${pos.cursor})`);
