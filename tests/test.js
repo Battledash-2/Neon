@@ -21,7 +21,9 @@ const tests = [
     require('./linked'),
 	require('./objects'),
 	require('./object-set'),
+	require('./arrays'),
 ];
+
 const manualTests = [
     23
 ];

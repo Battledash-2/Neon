@@ -50,7 +50,30 @@ class Interpreter {
 		}
 		// Assign
 		if (isTypeof('ASSIGN')) {
+			// Array
+			if (exp?.name?.type !== 'IDENTIFIER') {
+				let arr = this.eval(exp?.name?.array, env);
+				arr[this.eval(exp?.name?.select)] = this.eval(exp?.value, env);
+				
+				return this.eval(exp?.value, env);
+			}
 			return env.assign(exp?.name?.value, this.eval(exp?.value, env));
+		}
+
+		// ------------------------
+		// OOP
+
+		// Arrays
+		if (isTypeof('ARRAY')) {
+			return exp.values.map(c=>this.eval(c, env));
+		}
+
+		// Array/Object Select
+		if (isTypeof('ARRAY_SELECT')) {
+			let arr = this.eval(exp.array, env);
+			let to = this.eval(exp.select, env);
+
+			return arr[to];
 		}
 
 		// Objects

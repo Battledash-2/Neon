@@ -1,5 +1,5 @@
 const testCode = `
-obj.poop.A
+['poop'][1] = 'peep'
 `; // 1+1-3
 
 const Lexer = require('./lexer');

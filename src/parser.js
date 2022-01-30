@@ -126,6 +126,8 @@ module.exports = class Parser {
 				return this.functionCall(body);
 			case 'OBJ_SEPERATOR':
 				return this.linked(body);
+			case 'LBRACK':
+				return this.arraySelect(body);
 		}
 
 		return body;
@@ -187,6 +189,8 @@ module.exports = class Parser {
 				return this.assignment(identifier);
 			case 'OBJ_SEPERATOR':
 				return this.linked(identifier);
+			case 'LBRACK':
+				return this.arraySelect(identifier);
 		}
 
 		return identifier;
@@ -245,6 +249,40 @@ module.exports = class Parser {
 			values: obj,
 		}
 	}
+	
+	arraySelect(a) {
+		if (this.next?.type !== 'LBRACK') return a;
+		this.advance('LBRACK');
+		let select = this.statement();
+		this.advance('RBRACK');
+
+		let r = {
+			type: 'ARRAY_SELECT',
+			array: a,
+			select,
+		};
+
+		if (this.next?.type === 'LBRACK') {
+			return this.arraySelect(r);
+		}
+
+		if (this.next?.type === 'ASSIGNMENT') {
+			return this.assignment(r);
+		}
+
+		return r;
+	}
+
+	arrayStatement() {
+		this.advance('LBRACK');
+		let arr = this.argumentList();
+		this.advance('RBRACK');
+
+		return this.arraySelect({
+			type: 'ARRAY',
+			values: arr
+		});
+	}
 
 	primaryStatement() {
 		switch (this.next?.type) {
@@ -265,6 +303,8 @@ module.exports = class Parser {
 				return this.identifier();
 			case 'F_DEFINE':
 				return this.functionDefinition();
+			case 'LBRACK':
+				return this.arrayStatement();
 			default:
 				const r = this.next;
 				this.advance();
