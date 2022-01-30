@@ -17,4 +17,10 @@ module.exports = test => {
 	myArray[1] = 55
 	myArray[1]
 	`, 55);
+
+	test(`
+	let array = [32, 19]
+	array.push(5)
+	print(array);
+	`, "32,19,5")
 }
