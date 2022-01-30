@@ -63,7 +63,7 @@ class Interpreter {
 		
 		// Define
 		if (isTypeof('DEFINE')) {
-			return env.define(exp?.name?.value, this.eval(exp?.value, env));
+			return env.define(exp?.name?.value, this.eval(exp?.value, env), false);
 		}
 		// Assign
 		if (isTypeof('ASSIGN')) {

@@ -5,9 +5,13 @@ const interpreter = require('../../src/interpreter');
 const fs = require('fs');
 let fc = String(fs.readFileSync('./mini.neo'));
 
+console.time("Execution time");
+
 let lexed = new lexer(fc);
 let parsed = new parser(lexed);
 
 let runner = new interpreter();
 
 runner.eval(parsed);
+
+console.timeEnd("Execution time");

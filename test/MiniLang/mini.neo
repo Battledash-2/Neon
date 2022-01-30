@@ -1,4 +1,4 @@
-let str = "5 10 + .";
+let str = ".43 dup * .";
 
 fun run(lexed) {
 	let stack = [];
@@ -36,6 +36,12 @@ fun run(lexed) {
 			push(b / a);
 		} else if (current == '.') {
 			print(pop());
+		} else if (current == 'dup') {
+			let a = pop();
+			push(a);
+			push(a);
+		} else if (current == 'drop') {
+			pop();
 		}
 	}
 }
