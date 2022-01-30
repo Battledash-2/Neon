@@ -309,7 +309,7 @@ module.exports = class Parser {
 
 	arrayStatement() {
 		this.advance('LBRACK');
-		let arr = this.argumentList();
+		let arr = this.argumentList('RBRACK');
 		this.advance('RBRACK');
 
 		return this.arraySelect({

@@ -1,0 +1,43 @@
+let str = "5 10 + .";
+
+fun run(lexed) {
+	let stack = [];
+
+	fun pop() {
+		let v = stack.lastValue;
+		stack = stack.pop();
+		v;
+	}
+
+	fun push(v) {
+		stack = stack.push(v);
+	}
+
+	while (let i = 0; i<lexed.length; i++) {
+		let current = lexed[i];
+		if (isNaN(current.number) == false) {
+			// is number
+			push(current.number);
+		} else if (current == '+') {
+			let a = pop();
+			let b = pop();
+			push(b + a);
+		} else if (current == '-') {
+			let a = pop();
+			let b = pop();
+			push(b - a);
+		} else if (current == '*') {
+			let a = pop();
+			let b = pop();
+			push(b * a);
+		} else if (current == '/') {
+			let a = pop();
+			let b = pop();
+			push(b / a);
+		} else if (current == '.') {
+			print(pop());
+		}
+	}
+}
+
+run(str.match('[^\s]+'));

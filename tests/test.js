@@ -26,6 +26,7 @@ const tests = [
 	require('./loops'),
 	require('./assignments'),
 	require('./string'),
+	require('./nested-functions'),
 ];
 
 const manualTests = [

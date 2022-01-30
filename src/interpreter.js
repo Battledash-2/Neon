@@ -1,19 +1,31 @@
 const Environment = require('./environment');
 
 const Constructors = {
-	String(THIS) {
+	String(THIS, env) {
 		return new Environment({
 			value: THIS,
 			number: Number(THIS),
+			length: Number(THIS.length),
+
 			substring(from, to) {return THIS.slice(from, to);},
 			split(txt) {return THIS.split(txt);},
 			match(txt) {return THIS.match(new RegExp(txt, 'g'));}
 		});
 	},
-	Number(THIS) {
+	Number(THIS, env) {
 		return new Environment({
 			value: THIS,
 			string: THIS.toString(),
+		});
+	},
+	Array(THIS, env) {
+		return new Environment({
+			length: THIS.length,
+			lastValue: THIS[THIS.length-1],
+
+			push(v) {THIS.push(v); return THIS;},
+			pop() {THIS.pop(); return THIS;},
+			splice(pos, amo) {THIS.splice(pos, amo); return THIS;},
 		});
 	}
 }
@@ -70,7 +82,7 @@ class Interpreter {
 				case '++':
 					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1);
 				case '--':
-					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1);
+					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)-1);
 			}
 		}
 
@@ -104,14 +116,15 @@ class Interpreter {
 		if (isTypeof('LINKED')) {
 			let to = this.eval(exp.with, env);
 
-			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to);
-			if (exp.with?.type === 'NUMBER' || typeof to === 'number') to = Constructors.Number(to);
+			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to, env);
+			if (exp.with?.type === 'NUMBER' || typeof to === 'number') to = Constructors.Number(to, env);
+			if (exp.with?.type === 'ARRAY' || (typeof to === 'object' && Array.isArray(to))) to = Constructors.Array(to, env);
 			
 			if (exp.other?.type === 'FUNCTION_CALL') {
-				return this.callFunc(exp.other, to);
+				let fenv = new Environment(to.record, env);
+				return this.callFunc(exp.other, fenv);
 			}
 
-			// console.log(this.eval(exp.other, to), exp.other)
 			let lookup = exp.other?.type === 'IDENTIFIER' ? to.lookup(exp.other?.value) : this.eval(exp.other, to);
 			
 			return lookup;
@@ -136,7 +149,7 @@ class Interpreter {
 				body,
 				env,
 			}
-			
+
 			if (fname != null) env.define(fname, func);
 			return func;
 		}
@@ -150,10 +163,12 @@ class Interpreter {
 		}
 		// IF-Statements
 		if (isTypeof('CONDITION')) {
-			if (this.eval(exp.statement)) {
+			if (this.eval(exp.statement, env)) {
 				return this.evalBlock(exp.pass, env);
-			} else {
+			} else if(typeof exp.fail !== 'undefined') {
 				return this.evalBlock(exp.fail, env);
+			} else {
+				return false;
 			}
 		}
 		// Loops
@@ -164,8 +179,8 @@ class Interpreter {
 			let res;
 
 			while (this.eval(exp.execute[0], loopEnv)) {
-				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 				res = this.evalBlock(exp.pass, loopEnv);
+				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 			}
 
 			return res;
@@ -189,9 +204,13 @@ class Interpreter {
 
 	evalLoopNB(block, env) {
 		let res;
-		block.forEach(item=>{
-			res = this.eval(item, env);
-		});
+		if (Array.isArray(block)) {
+			block.forEach(item=>{
+				res = this.eval(item, env);
+			});
+		} else {
+			res = this.eval(block, env);
+		}
 		return res;
 	}
 
@@ -293,6 +312,7 @@ const GlobalEnvironment = new Environment({
 	
 	// Native functions
 	print(...args) { console.log(...args); return args.join(" "); },
+	isNaN(arg) {return isNaN(arg);}
 });
 
 module.exports = Interpreter;

@@ -18,6 +18,11 @@ class Environment {
         return this.resolve(name).record[name];
     }
 
+	nonInheritanceLookup(name) {
+		if (!this.record.hasOwnProperty(name)) throw new ReferenceError(`Could not find variables '${name}'`);
+		return this.record[name];
+	}
+
     resolve(name) {
         if (this.record.hasOwnProperty(name)) return this;
         if (this.parent == null) throw new ReferenceError(`Could not resolve variable '${name}'`);
