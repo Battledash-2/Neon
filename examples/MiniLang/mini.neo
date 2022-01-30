@@ -5,12 +5,12 @@ fun run(lexed) {
 
 	fun pop() {
 		let v = stack.lastValue;
-		stack = stack.pop();
+		stack.pop();
 		v;
 	}
 
 	fun push(v) {
-		stack = stack.push(v);
+		stack.push(v);
 	}
 
 	while (let i = 0; i<lexed.length; i++) {
@@ -44,6 +44,8 @@ fun run(lexed) {
 			pop();
 		}
 	}
+
+	stack; // return 'stack'
 }
 
 run(str.match('[^\s]+'));
