@@ -3,3 +3,4 @@ fun callback(cb) {
 }
 
 print(callback(fun (arg) {arg+'hey'}));
+callback(print);
