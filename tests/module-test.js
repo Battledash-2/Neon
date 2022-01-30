@@ -1,4 +1,5 @@
 module.exports = test => {
+	// math
 	test(`
 	Math.PI
 	`, Math.PI);
@@ -12,4 +13,9 @@ module.exports = test => {
 	let b = 2
 	Math.pow(a, b);
 	`, Math.pow(7, 2));
+
+	// process
+	test(`
+	// process.exit(5)
+	`, "HI");
 }

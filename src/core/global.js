@@ -1,10 +1,18 @@
 const Environment = require('../environment');
+const envfrom = (obj)=>new Environment(obj);
 
-const math = new Environment({
+// probably gonna be moved to seperate files in the future
+// ----------------------------------------------------------------
+// math module
+const math = envfrom({
 	PI: Math.PI,
 	sin: (n)=>Math.sin(n),
 	cos: (n)=>Math.cos(n),
 	pow: (n,e)=>Math.pow(n, e),
+});
+// process module
+const proc = envfrom({
+	exit: (code)=>process.exit(code),
 });
 
 const global = new Environment({
@@ -15,6 +23,7 @@ const global = new Environment({
 	false: false, // { constant: true, value: false, },
 
 	Math: math,
+	process: proc,
 
 	// Native functions
 	print(...args) { console.log(...args); return args.join(" "); },
