@@ -78,7 +78,11 @@ class Interpreter {
 			// Array
 			if (exp?.name?.type !== 'IDENTIFIER') {
 				let arr = this.eval(exp?.name?.array, env);
-				arr[this.eval(exp?.name?.select)] = this.eval(exp?.value, env);
+				if (Array.isArray(arr)) {
+					arr[this.eval(exp?.name?.select, env)] = this.eval(exp?.value, env);
+				} else {
+					arr.assign(this.eval(exp?.name?.select, env), this.eval(exp?.value, env), this.pos);
+				}
 				
 				return this.eval(exp?.value, env);
 			}
