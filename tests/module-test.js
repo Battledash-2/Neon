@@ -15,7 +15,7 @@ module.exports = test => {
 	`, Math.pow(7, 2));
 
 	// process
-	test(`
-	// process.exit(5)
-	`, "HI");
+	// test(`
+	// // process.exit(5)
+	// `, undefined);
 }
