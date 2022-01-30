@@ -27,6 +27,7 @@ const tests = [
 	require('./assignments'),
 	require('./string'),
 	require('./nested-functions'),
+	require('./unary'),
 ];
 
 const manualTests = [

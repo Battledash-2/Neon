@@ -60,7 +60,7 @@ class Interpreter {
 		}
 
 		if (isTypeof('UNARY')) {
-			return Number(exp?.operator + this.eval(exp?.value, env));
+			return this.handleUnaryExpression(exp, env);
 		}
 
 		// --------------------------------
@@ -303,6 +303,18 @@ class Interpreter {
 				return left <= right;
 			case '>=':
 				return left >= right;
+		}
+	}
+
+	handleUnaryExpression(exp, env) {
+		// return Number(exp?.operator + this.eval(exp?.value, env));
+		switch (exp?.operator) {
+			case '-':
+				return -(this.eval(exp?.value, env));
+			case '+':
+				return +(this.eval(exp?.value, env));
+			case '!':
+				return !(this.eval(exp?.value, env));
 		}
 	}
 

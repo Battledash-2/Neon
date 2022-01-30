@@ -9,7 +9,7 @@ const spec = [
 	[/^(==|<=|>=|<|>|!=|\|\||&&)/, "CONDITION_OPERATOR"],
 	[/^(\+\+|\-\-)/, "ASSIGNMENT_SS"],
 	[/^(\+=|\-=|\*=|=)/, "ASSIGNMENT"],
-	[/^[\+\-\*\/\^]/, "OPERATOR"],
+	[/^[\+\-\*\/\^\!]/, "OPERATOR"],
 
 	[/^\(/, 'LPAREN'],
 	[/^\)/, 'RPAREN'],
@@ -62,7 +62,7 @@ module.exports = class Lexer {
 	}
 
 	isAdditive(tok) {
-		return tok === '+' || tok === '-';
+		return tok === '+' || tok === '-' || tok === '!';
 	}
 	isMultiplicative(tok) {
 		return tok === '*' || tok === '/';

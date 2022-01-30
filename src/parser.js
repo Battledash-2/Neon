@@ -37,15 +37,16 @@ module.exports = class Parser {
 		let op, num;
 
 		if (this.next?.type === 'OPERATOR' && this.tokens.isAdditive(this.next.value)) {
-			op = this.next.value;
+			op = this.next;
 			this.advance('OPERATOR');
 			num = this.statement();
 		}
 
 		if (op != null) return {
 			type: 'UNARY',
-			operator: op,
+			operator: op.value,
 			value: num,
+			position: op?.position,
 		}
 
 		return this.primaryStatement();
@@ -63,7 +64,8 @@ module.exports = class Parser {
 				type: 'LOGICAL',
 				operator,
 				left,
-				right
+				right,
+				position: left?.position,
 			}
 		}
 
@@ -85,6 +87,7 @@ module.exports = class Parser {
 				type: 'DEFINE',
 				name,
 				value,
+				position: name?.position,
 			}
 		}
 		return name;
@@ -115,6 +118,7 @@ module.exports = class Parser {
 				operator: op,
 				left,
 				right,
+				position: left?.position,
 			}
 		}
 
@@ -134,6 +138,7 @@ module.exports = class Parser {
 		return {
 			type: 'BLOCK',
 			body,
+			position: body?.position,
 		}
 	}
 
@@ -174,6 +179,7 @@ module.exports = class Parser {
 			type: 'FUNCTION_CALL',
 			name,
 			arguments: args,
+			position: name?.position,
 		}
 	}
 
@@ -186,7 +192,8 @@ module.exports = class Parser {
 			type: 'ASSIGN',
 			operator,
 			name,
-			value
+			value,
+			position: name?.position,
 		};
 	}
 
@@ -198,6 +205,7 @@ module.exports = class Parser {
 			type: 'LINKED',
 			with: w,
 			other,
+			position: w?.position,
 		}
 	}
 
@@ -209,6 +217,7 @@ module.exports = class Parser {
 			type: 'SS_ASSIGN',
 			operator,
 			variable: name,
+			position: name?.position,
 		}
 	}
 
@@ -234,7 +243,7 @@ module.exports = class Parser {
 
 	functionDefinition() {
 		// Get function name
-		this.advance('F_DEFINE');
+		let pos = this.advance('F_DEFINE');
 		let name = this.next;
 		this.advance();
 
@@ -255,6 +264,7 @@ module.exports = class Parser {
 			name,
 			arguments: argNames,
 			body,
+			position: pos?.position,
 		};
 	}
 
@@ -283,6 +293,7 @@ module.exports = class Parser {
 		return {
 			type: 'OBJECT',
 			values: obj,
+			position: obj?.position,
 		}
 	}
 	
@@ -296,6 +307,7 @@ module.exports = class Parser {
 			type: 'ARRAY_SELECT',
 			array: a,
 			select,
+			position: a?.position,
 		};
 
 		if (this.next?.type === 'LBRACK') {
@@ -316,7 +328,8 @@ module.exports = class Parser {
 
 		return this.arraySelect({
 			type: 'ARRAY',
-			values: arr
+			values: arr,
+			position: arr?.position,
 		});
 	}
 
@@ -342,6 +355,7 @@ module.exports = class Parser {
 			statement,
 			pass,
 			fail,
+			position: statement?.position,
 		};
 	}
 
@@ -352,7 +366,7 @@ module.exports = class Parser {
 	}
 
 	loopStatement() {
-		this.advance('LOOP');
+		let pos = this.advance('LOOP');
 		this.advance('LPAREN');
 
 		let definitions = [];
@@ -386,6 +400,7 @@ module.exports = class Parser {
 			condition,
 			execute,
 			pass,
+			position: pos?.position,
 		};
 	}
 

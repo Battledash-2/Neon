@@ -1,8 +1,5 @@
 const testCode = `
-if (isNaN(current.number) == false) {
-	// is number
-	push(current.number);
-}
+!true
 `; // 1+1-3
 
 const Lexer = require('./lexer');
