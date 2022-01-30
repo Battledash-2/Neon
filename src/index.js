@@ -1,7 +1,7 @@
 const testCode = `
-while (let a = 0; a < 5; a = a + 1;) {
-	print('a')
-}
+let b = 20
+
+b--
 `; // 1+1-3
 
 const Lexer = require('./lexer');

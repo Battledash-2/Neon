@@ -24,6 +24,7 @@ const tests = [
 	require('./arrays'),
 	require('./conditional'),
 	require('./loops'),
+	require('./assignments'),
 ];
 
 const manualTests = [

@@ -176,11 +176,13 @@ module.exports = class Parser {
 	}
 
 	assignment(name) {
+		let operator = this.next.value;
 		this.advance('ASSIGNMENT');
 		let value = this.statement();
 
 		return {
 			type: 'ASSIGN',
+			operator,
 			name,
 			value
 		};
@@ -197,6 +199,17 @@ module.exports = class Parser {
 		}
 	}
 
+	assignmentSyntax(name) {
+		let operator = this.next.value;
+		this.advance('ASSIGNMENT_SS');
+
+		return {
+			type: 'SS_ASSIGN',
+			operator,
+			variable: name,
+		}
+	}
+
 	identifier() {
 		let identifier = this.next;
 		this.advance('IDENTIFIER');
@@ -210,6 +223,8 @@ module.exports = class Parser {
 				return this.linked(identifier);
 			case 'LBRACK':
 				return this.arraySelect(identifier);
+			case 'ASSIGNMENT_SS':
+				return this.assignmentSyntax(identifier);
 		}
 
 		return identifier;
@@ -362,8 +377,6 @@ module.exports = class Parser {
 		this.advance('RPAREN');
 
 		let pass = this.blockStatement();
-
-		console.log(definitions, condition, execute)
 
 		return {
 			type: 'R_LOOP',

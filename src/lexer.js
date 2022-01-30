@@ -6,9 +6,10 @@ const spec = [
 
 	// ---------------------------
 	// Math
+	[/^(\+\+|\-\-)/, "ASSIGNMENT_SS"],
+	[/^(\+=|\-=|\*=|=)/, "ASSIGNMENT"],
 	[/^[\+\-\*\/\^]/, "OPERATOR"],
 	[/^(==|<=|>=|<|>|!=|\|\||&&)/, "CONDITION_OPERATOR"],
-	[/^[\=]/, "ASSIGNMENT"],
 
 	[/^\(/, 'LPAREN'],
 	[/^\)/, 'RPAREN'],

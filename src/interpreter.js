@@ -58,7 +58,16 @@ class Interpreter {
 				
 				return this.eval(exp?.value, env);
 			}
-			return env.assign(exp?.name?.value, this.eval(exp?.value, env));
+			return this.generalAssign(exp, env);
+		}
+		// Assign Syntax Sugar
+		if (isTypeof('SS_ASSIGN')) {
+			switch (exp.operator) {
+				case '++':
+					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1);
+				case '--':
+					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1);
+			}
 		}
 
 		// ------------------------
@@ -210,6 +219,19 @@ class Interpreter {
 		// let funcEnv = new Environment(args, env);
 		let funcEnv = new Environment(args, func.env);
 		return this.evalLoop(func.body, funcEnv);
+	}
+
+	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
+		switch (exp.operator) {
+			case '=':
+				return env.assign(exp?.name?.value, this.eval(exp?.value, env));
+			case '+=':
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env));
+			case '-=':
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) - this.eval(exp?.value, env));
+			case '*=':
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) * this.eval(exp?.value, env));
+		}
 	}
 
 	handleBinaryExpression(exp, env) {
