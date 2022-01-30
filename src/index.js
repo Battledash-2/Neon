@@ -1,8 +1,6 @@
 const testCode = `
-if (38 >= 32) {
-	print("E")
-} else {
-	print("A");
+while (let a = 0; a < 5; a = a + 1;) {
+	print('a')
 }
 `; // 1+1-3
 

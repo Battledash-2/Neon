@@ -144,6 +144,20 @@ class Interpreter {
 				return this.evalBlock(exp.fail, env);
 			}
 		}
+		// Loops
+		if (isTypeof('R_LOOP')) {
+			let loopEnv = new Environment({}, env);
+			this.evalLoopNB(exp.definitions, loopEnv);
+			
+			let res;
+
+			while (this.eval(exp.execute[0], loopEnv)) {
+				this.evalLoopNB(exp.execute.slice(1), loopEnv);
+				res = this.evalBlock(exp.pass, loopEnv);
+			}
+
+			return res;
+		}
 
 		// Block
 		if (isTypeof('BLOCK')) {
@@ -161,12 +175,16 @@ class Interpreter {
 		throw new Error(`Unknown execution: ${JSON.stringify(exp)}`);
 	}
 
-	evalLoop(block, env) {
+	evalLoopNB(block, env) {
 		let res;
-		block.body.forEach(item=>{
+		block.forEach(item=>{
 			res = this.eval(item, env);
 		});
 		return res;
+	}
+
+	evalLoop(block, env) {
+		return this.evalLoopNB(block.body, env);
 	}
 
 	evalBlock(blk, env) {

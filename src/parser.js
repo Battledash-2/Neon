@@ -49,34 +49,6 @@ module.exports = class Parser {
 		return this.primaryStatement();
 	}
 
-	// logicalMOREEQ() {
-	// 	return this.logicalExpression('unary', '>=');
-	// }
-
-	// logicalMORE() {
-	// 	return this.logicalExpression('logicalMOREEQ', '>');
-	// }
-
-	// logicalLESSEQ() {
-	// 	return this.logicalExpression('logicalMORE', '<=');
-	// }
-
-	// logicalLESS() {
-	// 	return this.logicalExpression('logicalLESSEQ', '<');
-	// }
-
-	// logicalEQUAL() {
-	// 	return this.logicalExpression('logicalLESS', '==');
-	// }
-
-	// logicalNOT() {
-	// 	return this.logicalExpression('logicalEQUAL', '!=');
-	// }
-
-	// logicalAND() {
-	// 	return this.logicalExpression('logicalNOT', '&&');
-	// }
-
 	logicalExpression() {
 		let left = this.unary();
 
@@ -362,6 +334,46 @@ module.exports = class Parser {
 		return condition;
 	}
 
+	loopStatement() {
+		this.advance('LOOP');
+		this.advance('LPAREN');
+
+		let definitions = [];
+		let condition;
+		let execute = [];
+
+		while (this.next != null && this.next.type != 'RPAREN') {
+			let stmt = this.statement();
+			// res.push(stmt);
+			switch (stmt?.type) {
+				case 'DEFINE':
+					definitions.push(stmt);
+					break;
+				case 'CONDITION':
+					if (condition) {execute.push(stmt); break;}
+					condition.push(stmt);
+					break;
+				default:
+					execute.push(stmt);
+			}
+			if (this.next?.type === 'EXPR_END') this.advance('EXPR_END', ';');
+		}
+
+		this.advance('RPAREN');
+
+		let pass = this.blockStatement();
+
+		console.log(definitions, condition, execute)
+
+		return {
+			type: 'R_LOOP',
+			definitions,
+			condition,
+			execute,
+			pass,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -385,6 +397,8 @@ module.exports = class Parser {
 				return this.arrayStatement();
 			case 'CONDITIONAL':
 				return this.conditionalStatement();
+			case 'LOOP':
+				return this.loopStatement();
 			default:
 				const r = this.next;
 				this.advance();
