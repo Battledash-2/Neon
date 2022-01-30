@@ -1,3 +1,0 @@
-let popVal = "POP"
-
-export popVal

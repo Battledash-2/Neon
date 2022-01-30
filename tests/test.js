@@ -31,7 +31,6 @@ const tests = [
 	require('./object-test'),
 	require('./constants'),
 	require('./module-test'),
-	require('./import/import'),
 ];
 
 const manualTests = [
