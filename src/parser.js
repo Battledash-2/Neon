@@ -1,9 +1,11 @@
 const StringHandle = require('./escapes');
 
 module.exports = class Parser {
-	constructor(tokens) {
+	constructor(tokens, filename='runtime') {
 		this.tokens = tokens;
 		this.next = this.tokens.nextToken();
+
+		this.filename = filename;
 
 		return this.program();
 	}
@@ -444,8 +446,8 @@ module.exports = class Parser {
 	advance(type, lk) {
 		lk = lk ?? type;
 		if (type != null) {
-			if (this.next == null) throw new SyntaxError(`Input abruptly ended while expecting '${lk}'`);
-			if (this.next.type !== type) throw new SyntaxError(`Unexpected token '${this.next.value}': Expected '${lk}'`);
+			if (this.next == null) throw new SyntaxError(`Input abruptly ended while expecting '${lk}' (${this.filename}:EOF)`);
+			if (this.next.type !== type) throw new SyntaxError(`Unexpected token '${this.next.value}': Expected '${lk}' (${this.filename}:${this.next.line}:${this.next.cursor}`);
 		}
 
 		this.next = this.tokens.nextToken();

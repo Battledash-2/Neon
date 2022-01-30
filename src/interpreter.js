@@ -31,12 +31,20 @@ const Constructors = {
 }
 
 class Interpreter {
+	constructor(filename='runtime') {
+		this.filename = filename;
+	}
 	eval(exp, env=GlobalEnvironment) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
 		if (typeof exp === 'number') return exp;
 		if (typeof exp === 'string') return exp;
 		if (Array.isArray(exp)) return exp;
+
+		this.pos = {
+			...exp.position,
+			filename: this.filename,
+		};
 
 		// Type related stuff:
 		if (isTypeof('NUMBER')) {
@@ -58,12 +66,12 @@ class Interpreter {
 		// --------------------------------
 		// Variable related stuff:
 		if (isTypeof('IDENTIFIER')) {
-			return env.lookup(exp?.value);
+			return env.lookup(exp?.value, this.pos);
 		}
 		
 		// Define
 		if (isTypeof('DEFINE')) {
-			return env.define(exp?.name?.value, this.eval(exp?.value, env), false);
+			return env.define(exp?.name?.value, this.eval(exp?.value, env), this.pos);
 		}
 		// Assign
 		if (isTypeof('ASSIGN')) {
@@ -80,9 +88,9 @@ class Interpreter {
 		if (isTypeof('SS_ASSIGN')) {
 			switch (exp.operator) {
 				case '++':
-					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1);
+					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)+1, this.pos);
 				case '--':
-					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)-1);
+					return env.assign(exp?.variable?.value, env.lookup(exp?.variable?.value)-1, this.pos);
 			}
 		}
 
@@ -150,7 +158,7 @@ class Interpreter {
 				env,
 			}
 
-			if (fname != null) env.define(fname, func);
+			if (fname != null) env.define(fname, func, this.pos);
 			return func;
 		}
 
@@ -199,7 +207,7 @@ class Interpreter {
 		}
 
 		// Unknown
-		throw new Error(`Unknown execution: ${JSON.stringify(exp)}`);
+		throw new Error(`Unexpected AST '${exp.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 	}
 
 	evalLoopNB(block, env) {
@@ -246,13 +254,13 @@ class Interpreter {
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
 		switch (exp.operator) {
 			case '=':
-				return env.assign(exp?.name?.value, this.eval(exp?.value, env));
+				return env.assign(exp?.name?.value, this.eval(exp?.value, env), this.pos);
 			case '+=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env));
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env), this.pos);
 			case '-=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) - this.eval(exp?.value, env));
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) - this.eval(exp?.value, env), this.pos);
 			case '*=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) * this.eval(exp?.value, env));
+				return env.assign(exp?.name?.value, env.lookup(exp.name.value) * this.eval(exp?.value, env), this.pos);
 		}
 	}
 

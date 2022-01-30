@@ -14,16 +14,16 @@ class Environment {
         return value;
     }
 
-    lookup(name) {
-        return this.resolve(name).record[name];
+    lookup(name, pos) {
+        return this.resolve(name, pos).record[name];
     }
 
-    resolve(name) {
+    resolve(name, pos) {
         if (this.record.hasOwnProperty(name)) return this;
-        if (this.parent == null) throw new ReferenceError(`Could not resolve variable '${name}'`);
+        if (this.parent == null) throw new ReferenceError(`Could not resolve variable '${name}' (${pos.filename}:${pos.line}:${pos.cursor})`);
         if (this.parent.record.hasOwnProperty(name)) return this.parent;
 
-        return this.parent.resolve(name);
+        return this.parent.resolve(name, pos);
     }
 }
 

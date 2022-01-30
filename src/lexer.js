@@ -47,9 +47,14 @@ const spec = [
 ];
 
 module.exports = class Lexer {
-	constructor(source) {
+	constructor(source, filename='runtime') {
 		this.source = source;
 		this.cursor = 0;
+
+		// for error logging
+		this.line = 1;
+		this.pos = 1;
+		this.filename = filename;
 	}
 	
 	reachedEof() {
@@ -71,6 +76,7 @@ module.exports = class Lexer {
 		
 		if (match == null) return null;
 		this.cursor += match[0].length;
+		this.pos += match[0].length;
 
 		return match[0];
 	}
@@ -83,15 +89,25 @@ module.exports = class Lexer {
 			const match = this.match(rgx, string);
 
 			if (match == null) continue;
-			if (type == null) return this.nextToken();
+			switch (type) {
+				case null:
+					let newlines = match.match(/\n+/g);
+					this.line += newlines?.length ?? 0;
+					this.pos = newlines?.length > 0 ? 1 : this.pos;
 
+					return this.nextToken();			
+			}
 
 			return {
 				type,
 				value: match,
+				position: {
+					line: this.line,
+					cursor: this.pos - match.length,
+				}
 			}
 		}
 
-		throw new SyntaxError(`Unknown token '${string.slice(0, 1)}'`);
+		throw new SyntaxError(`Unknown token '${string.slice(0, 1)}' (${this.filename}:${this.line}:${this.cursor})`);
 	}
 }
