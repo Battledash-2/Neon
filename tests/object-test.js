@@ -18,6 +18,8 @@ module.exports = test => {
 	myObj.funnyFunc(b);
 	`, 'pooppoop');
 
+
+	// Scope related testing
 	test(`
 	let myObj = {
 		funnyFunc: fun (a) {
@@ -26,7 +28,19 @@ module.exports = test => {
 	}
 	(fun () {
 		let c = 's'
-		print(myObj.funnyFunc('s'))
+		print(myObj.funnyFunc(c))
+	})();
+	`, 'poops');
+
+	test(`
+	let myObj = {
+		funnyFunc: fun (a) {
+			'poop'+a;
+		}
+	}
+	let c = 's'
+	(fun () {
+		print(myObj.funnyFunc(c))
 	})();
 	`, 'poops');
 }
