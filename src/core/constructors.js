@@ -1,5 +1,3 @@
-const Environment = require('../environment');
-
 module.exports = {
 	String(THIS, env) {
 		return {
