@@ -27,11 +27,16 @@ const spec = [
 	// -- Variables:
 	[/^if\b/, "CONDITIONAL"],
 	[/^else\b/, "CONDITIONAL_ELSE"],
+
 	[/^(var|let|const)\b/, "DEFINE"],
 	[/^(for|while)\b/, "LOOP"],
+
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
+
 	[/^\bfun\b/, "F_DEFINE"],
+	[/^\bclass\b/, "C_DEFINE"],
+	[/^\bnew\b/, "C_CREATE"],
 	
 	// ---------------------------
 	// Functional

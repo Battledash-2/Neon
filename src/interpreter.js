@@ -114,7 +114,7 @@ class Interpreter {
 				return this.callFunc(exp.other, fenv);
 			}
 
-			let lookup = exp.other?.type === 'IDENTIFIER' ? to.nonInheritedlookup(exp.other?.value) : this.eval(exp.other, to);
+			let lookup = exp.other?.type === 'IDENTIFIER' ? to.nonInheritedlookup(exp.other?.value, this.pos) : this.eval(exp.other, new Environment(to.record));
 			
 			return lookup;
 		}
@@ -141,6 +141,39 @@ class Interpreter {
 
 			if (fname != null) env.define(fname, func, this.pos);
 			return func;
+		}
+
+		// ------------------------------------
+		// Classes (OOP)
+		// Class instance
+		if (isTypeof('CLASS_INSTANCE')) {
+			const cls = this.eval(exp?.name, env);
+
+			let args = {};
+			for (let pos in cls.arguments) {
+				if (cls.arguments[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+				args[cls.arguments[pos].value] = this.eval(exp?.arguments[pos], env);
+			}
+
+			let classEnv = new Environment(args, cls.env);
+			this.evalLoop(cls.body, classEnv);
+			return classEnv;
+		}
+
+		// Class definition
+		if (isTypeof('CLASS_DEFINITION')) {
+			const fname = exp?.name?.value;
+			const args = exp?.arguments;
+			const body = exp?.body;
+
+			let cls = {
+				arguments: args,
+				body,
+				env: new Environment(env.record, env.parent),
+			}
+
+			if (fname != null) env.define(fname, cls, this.pos);
+			return cls;
 		}
 
 		// ----------------------

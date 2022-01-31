@@ -224,15 +224,11 @@ module.exports = class Parser {
 		}
 	}
 
-	identifier() {
+	identifier(allowFunc=true) {
 		let identifier = this.next;
 		this.advance('IDENTIFIER');
 		
 		switch (this.next?.type) {
-			case 'LPAREN':
-				return this.functionCall(identifier);
-			case 'ASSIGNMENT':
-				return this.assignment(identifier);
 			case 'OBJ_SEPERATOR':
 				return this.linked(identifier);
 			case 'LBRACK':
@@ -241,7 +237,55 @@ module.exports = class Parser {
 				return this.assignmentSyntax(identifier);
 		}
 
+		if (this.next?.type === 'LPAREN' && allowFunc) return this.functionCall(identifier);
+		if (this.next?.type === 'ASSIGNMENT' && allowFunc) return this.assignment(identifier);
+
 		return identifier;
+	}
+
+	classInstance() {
+		const position = this.next?.position;
+		this.advance('C_CREATE', 'new');
+
+		const name = this.identifier(false);
+
+		this.advance('LPAREN', '(');
+		const args = this.argumentList('RPAREN');
+		this.advance('RPAREN', ')');
+
+		return {
+			type: 'CLASS_INSTANCE',
+			name,
+			arguments: args,
+			position,
+		};
+	}
+
+	classDefinition() {
+		// Get function name
+		let pos = this.advance('C_DEFINE');
+		let name = this.next;
+		this.advance();
+
+		// Get the arguments
+		if (name?.type !== 'LPAREN') {
+			this.advance('LPAREN');
+		} else {
+			name = null;
+		}
+		let argNames = this.argumentList('RPAREN');
+		this.advance('RPAREN');
+
+		// Get the function body
+		const body = this.blockStatement();
+
+		return {
+			type: 'CLASS_DEFINITION',
+			name,
+			arguments: argNames,
+			body,
+			position: pos?.position,
+		};
 	}
 
 	functionDefinition() {
@@ -281,7 +325,7 @@ module.exports = class Parser {
 			if (this.next?.type === 'RBLOCK') break;
 			let name = this.next;
 			
-			if (this.next?.type !== 'IDENTIFIER' && this.next?.type !== 'STRING') throw new TypeError(`Value type is expected to be a string or identifier`);
+			if (this.next?.type !== 'IDENTIFIER' && this.next?.type !== 'STRING') throw new TypeError(`Value type is expected to be a string or identifier (${this.filename}:${this.next.position.line}:${this.next.position.cursor})`);
 			if (this.next?.type === 'STRING') name.value = StringHandle(name.value.slice(1, -1));
 
 			this.advance();
@@ -450,6 +494,10 @@ module.exports = class Parser {
 				return this.identifier();
 			case 'F_DEFINE':
 				return this.functionDefinition();
+			case 'C_DEFINE':
+				return this.classDefinition();
+			case 'C_CREATE':
+				return this.classInstance();
 			case 'LBRACK':
 				return this.arrayStatement();
 			case 'CONDITIONAL':

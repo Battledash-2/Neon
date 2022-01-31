@@ -1,5 +1,9 @@
 const testCode = `
-hello.sdjhi
+class MyClass() {
+	let a = 5;
+}
+let myclass = new MyClass();
+myclass.a;
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');
