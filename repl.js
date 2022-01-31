@@ -29,7 +29,7 @@ Copyright (c) 2022 Battledash-2 (& Neon)\n`);
 			if (args.showTime) console.time('Run Time');
 			res = new interpreter('runtime').eval(new parser(new lexer(r), 'runtime'), global);
 		} catch(e) {
-			console.log('\u001b[91m'+e.message+'\u001b[0m');
+			console.log('\u001b[91mError\u001b[0m: '+e.message);
 		}
 		if (typeof res === 'number') console.log('\u001b[91m'+res+'\u001b[0m');
 		if (typeof res === 'string') console.log('\u001b[92m"'+res+'"\u001b[0m');
