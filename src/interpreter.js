@@ -43,8 +43,8 @@ class Interpreter {
 		// --------------------------------
 		// Variable related stuff:
 		if (isTypeof('IDENTIFIER')) {
-			if (!preventInherit) return env.lookup(exp?.value, this.pos);
-			return env.nonInheritedlookup(exp?.value, this.pos);
+			if (!preventInherit) return (env instanceof Environment) ? env.lookup(exp?.value, this.pos) : env[exp?.value];
+			return (env instanceof Environment) ? env.nonInheritedlookup(exp?.value, this.pos) : env[exp?.value];
 		}
 		
 		// Define
@@ -56,11 +56,11 @@ class Interpreter {
 			// Array
 			if (exp?.name?.type !== 'IDENTIFIER') {
 				let arr = this.eval(exp?.name?.array, env);
-				if (Array.isArray(arr)) {
-					arr[this.eval(exp?.name?.select, env)] = this.eval(exp?.value, env);
-				} else {
-					arr.assign(this.eval(exp?.name?.select, env), this.eval(exp?.value, env), this.pos);
-				}
+				// if (Array.isArray(arr)) {
+				arr[this.eval(exp?.name?.select, env)] = this.eval(exp?.value, env);
+				// } else {
+				//	arr.assign(this.eval(exp?.name?.select, env), this.eval(exp?.value, env), this.pos);
+				// }
 				
 				return this.eval(exp?.value, env);
 			}
@@ -104,20 +104,18 @@ class Interpreter {
 
 		// Linked
 		if (isTypeof('LINKED')) {
-			let to = this.eval(exp.with, env, false, true);
+			let to = this.eval(exp?.with, env, false, preventInherit);
 
 			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to, env);
 			if (exp.with?.type === 'NUMBER' || typeof to === 'number') to = Constructors.Number(to, env);
 			if (exp.with?.type === 'ARRAY' || (typeof to === 'object' && Array.isArray(to))) to = Constructors.Array(to, env);
-			
-			if (exp.other?.type === 'FUNCTION_CALL') {
-				let fenv = new Environment(to?.record ?? to, env);
-				return this.callFunc(exp.other, fenv);
-			}
 
-			let lookup = exp.other?.type === 'IDENTIFIER' ? ((to instanceof Environment) ? to.nonInheritedlookup(exp.other?.value, this.pos) : to[exp.other?.value]) : this.eval(exp.other, new Environment(to?.record ?? to, env, false, true));
-			
-			return lookup;
+			if (exp?.other?.type === 'FUNCTION_CALL') {
+				let fenv = new Environment((to instanceof Environment) ? to.record : to, env);
+				return this.callFunc(exp?.other, fenv);
+			}
+			let pos = exp?.other?.type === 'IDENTIFIER' ? ((to instanceof Environment) ? to.lookup(exp?.other?.value) : to[exp?.other?.value]) : this.eval(exp?.other, ((to instanceof Environment) ? to : new Environment(to, env)), false, true);
+			return pos;
 		}
 
 		// ------------------------
@@ -274,13 +272,18 @@ class Interpreter {
 
 		// let funcEnv = new Environment(args, env);
 		let funcEnv = new Environment(args, func.env);
+		// console.log('f', funcEnv.parent.record.myObj)
 		return this.evalLoop(func.body, funcEnv);
 	}
 
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
 		switch (exp.operator) {
 			case '=':
-				return env.assign(exp?.name?.value, this.eval(exp?.value, env), this.pos);
+				if (env instanceof Environment) {
+					return env.assign(exp?.name?.value, this.eval(exp?.value, env), this.pos);
+				} else {
+					return env[exp?.name?.value] = this.eval(exp?.value, env);
+				}
 			case '+=':
 				return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env), this.pos);
 			case '-=':

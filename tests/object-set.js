@@ -20,4 +20,28 @@ module.exports = test => {
 
 	obj.a.c
 	`, 42);
+
+	test(`
+	let obj = {
+		a: {
+			c: 23
+		}
+	}
+
+	obj.a['c'] = 42
+
+	obj.a.c
+	`, 42);
+
+	test(`
+	let obj = {
+		a: {
+			c: 23
+		}
+	}
+
+	obj['a']['c'] = 42
+
+	obj.a.c
+	`, 42);
 }
