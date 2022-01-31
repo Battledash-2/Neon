@@ -3,15 +3,27 @@
 // const Lexer = require('./lexer');
 // const Parser = require('./parser');
 const Environment = require('./environment');
-
 const Constructors = require('./core/constructors');
+
+class Internal {
+	constructor(val) {
+		this.value = val;
+	}
+	get() {
+		return this.value;
+	}
+	set(v) {
+		this.value = v;
+		return true;
+	}
+}
 
 class Interpreter {
 	constructor(filename='runtime') {
 		this.filename = filename;
 		this.exports = {};
 	}
-	eval(exp, env=GlobalEnvironment, exportMode=false, preventInherit=false) {
+	eval(exp, env=GlobalEnvironment, exportMode=false, preventInherit=false, stopOn) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
 		if (typeof exp === 'number') return exp;
@@ -189,9 +201,9 @@ class Interpreter {
 		// IF-Statements
 		if (isTypeof('CONDITION')) {
 			if (this.eval(exp.statement, env)) {
-				return this.evalBlock(exp.pass, env);
+				return this.evalBlock(exp.pass, env, stopOn);
 			} else if(typeof exp.fail !== 'undefined') {
-				return this.evalBlock(exp.fail, env);
+				return this.evalBlock(exp.fail, env, stopOn);
 			} else {
 				return false;
 			}
@@ -204,7 +216,9 @@ class Interpreter {
 			let res;
 
 			while (this.eval(exp.execute[0], loopEnv)) {
-				res = this.evalBlock(exp.pass, loopEnv);
+				let r = this.evalBlock(exp.pass, loopEnv, 'BREAK');
+				if (r instanceof Internal && r?.get?.() === 'break') break;
+				res = r;
 				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 			}
 
@@ -234,29 +248,43 @@ class Interpreter {
 			return res;
 		}
 
+		// Break / Return
+		if (isTypeof('BREAK')) {
+			return new Internal('break');
+		}
+		if (isTypeof('RETURN')) {
+			throw 'unimplemented';
+		}
+
 		// Unknown
 		throw new Error(`Unexpected AST '${exp.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 	}
 
-	evalLoopNB(block, env) {
+	evalLoopNB(block, env, stn) {
 		let res;
 		if (Array.isArray(block)) {
-			block.forEach(item=>{
-				res = this.eval(item, env);
-			});
+			for (let item of block) {
+				if (item.type === stn) {
+					return new Internal('break');
+				}
+				res = this.eval(item, env, false, false, stn);
+			}
 		} else {
-			res = this.eval(block, env);
+			if (block.type === stn) {
+				return new Internal('break');
+			}
+			res = this.eval(block, env, false, false, stn);
 		}
 		return res;
 	}
 
-	evalLoop(block, env) {
-		return this.evalLoopNB(block.body, env);
+	evalLoop(block, env, stn) {
+		return this.evalLoopNB(block.body, env, stn);
 	}
 
-	evalBlock(blk, env) {
+	evalBlock(blk, env, stn) {
 		const blockEnv = new Environment({}, env);
-		return this.evalLoop(blk, blockEnv);
+		return this.evalLoop(blk, blockEnv, stn);
 	}
 
 	callFunc(exp, env) {

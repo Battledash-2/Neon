@@ -31,10 +31,13 @@ const spec = [
 	[/^(var|let|const)\b/, "DEFINE"],
 	[/^(for|while)\b/, "LOOP"],
 
+	[/^break\b/, "BREAK"],
+
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
 
 	[/^\bfun\b/, "F_DEFINE"],
+	
 	[/^\bclass\b/, "C_DEFINE"],
 	[/^\bnew\b/, "C_CREATE"],
 	
@@ -115,6 +118,6 @@ module.exports = class Lexer {
 			}
 		}
 
-		throw new SyntaxError(`Unknown token '${string.slice(0, 1)}' (${this.filename}:${this.line}:${this.cursor})`);
+		throw new SyntaxError(`Unexpected token '${string.slice(0, 1)}' (${this.filename}:${this.line}:${this.cursor})`);
 	}
 }
