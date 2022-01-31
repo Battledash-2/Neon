@@ -14,9 +14,9 @@
 - Everything is finished...
 
 ## 🏁 Finished 🔚
-- [ ] OOP support (still missing `extends` keyword) (Classes)
-- [ ] (...initial) (objects, array, negated sets, if statements, for/while, variables, scopes)
+- [x] OOP support (still missing `extends` keyword) (Classes)
+- [x] (...initial) (objects, array, negated sets, if statements, for/while, variables, scopes)
 
 ## 😎 Examples 🧪
-- [ ] Mini-language / small lexer & parser-less language (`./examples/MiniLang`)
-- [ ] Lambda functions (`./examples/LambdaFunctions`)
+- Mini-language / small lexer & parser-less language (`./examples/MiniLang`)
+- Lambda functions (`./examples/LambdaFunctions`)
