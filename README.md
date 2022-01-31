@@ -11,10 +11,12 @@
 4) To initiate, use `new Interpreter().eval(new Parser(new Lexer('ANY CODE HERE')));`
 
 ## 📃 Todo 💹
-- [ ] Full OOP support (Classes)
+- Everything is finished...
 
 ## 🏁 Finished 🔚
+- [ ] OOP support (still missing `extends` keyword) (Classes)
 - [ ] (...initial) (objects, array, negated sets, if statements, for/while, variables, scopes)
 
 ## 😎 Examples 🧪
 - [ ] Mini-language / small lexer & parser-less language (`./examples/MiniLang`)
+- [ ] Lambda functions (`./examples/LambdaFunctions`)
