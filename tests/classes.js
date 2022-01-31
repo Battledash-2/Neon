@@ -40,15 +40,12 @@ module.exports = test => {
 	`, "c");
 
 	test(`
-	let b = 'JSI'
 	let obj = {
 		idk: {
-			myfunc: fun (a) {
-				print("A"+a);
-			},
+			poo: 'hello'
 		}
 	}
 
-	obj.idk.myfunc();
-	`, "AJSI");
+	obj.idk.poo
+	`, 'hello');
 }
