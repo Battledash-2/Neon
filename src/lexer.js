@@ -32,6 +32,7 @@ const spec = [
 	[/^(for|while)\b/, "LOOP"],
 
 	[/^break\b/, "BREAK"],
+	[/^return\b/, "RETURN"],
 
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],

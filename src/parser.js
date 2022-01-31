@@ -481,6 +481,18 @@ module.exports = class Parser {
 		}
 	}
 
+	returnStatement() {
+		let pos = this.next.position;
+		this.advance('RETURN', 'return');
+		let vtr = this.statement();
+
+		return {
+			type: 'RETURN',
+			value: vtr,
+			position: pos,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -514,6 +526,8 @@ module.exports = class Parser {
 				return this.importStatement();
 			case 'EXPORT':
 				return this.exportStatement();
+			case 'RETURN':
+				return this.returnStatement();
 			default:
 				const r = this.next;
 				this.advance();

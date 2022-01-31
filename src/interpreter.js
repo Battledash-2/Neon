@@ -253,7 +253,10 @@ class Interpreter {
 			return new Internal('break');
 		}
 		if (isTypeof('RETURN')) {
-			throw 'unimplemented';
+			return new Internal({
+				type: 'return',
+				value: this.eval(exp.value, env),
+			});
 		}
 
 		// Unknown
@@ -305,7 +308,23 @@ class Interpreter {
 		// let funcEnv = new Environment(args, env);
 		let funcEnv = new Environment(args, func.env);
 		// console.log('f', funcEnv.parent.record.myObj)
-		return this.evalLoop(func.body, funcEnv);
+		let block = func.body.body;
+		let res;
+		if (Array.isArray(block)) {
+			for (let item of block) {
+				if (item.type === 'RETURN') {
+					return this.eval(item.value, funcEnv);
+				}
+				res = this.eval(item, funcEnv, false, false, 'RETURN');
+			}
+		} else {
+			if (block.type === 'RETURN') {
+				return this.eval(block.value, funcEnv);
+			}
+			res = this.eval(block, funcEnv, false, false, 'RETURN');
+		}
+		return res;
+		// return this.evalLoop(func.body, funcEnv, );
 	}
 
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
