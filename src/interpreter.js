@@ -11,6 +11,9 @@ class Interpreter {
 		this.filename = filename;
 		this.exports = {};
 	}
+	static formatEnv(env) {
+		return env?.record ?? '[[undisplayable]]';
+	}
 	eval(exp, env=GlobalEnvironment, exportMode=false) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
