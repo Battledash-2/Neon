@@ -9,6 +9,8 @@ const global = new Environment({
 	true: true, // { constant: true, value: true, },
 	false: false, // { constant: true, value: false, },
 
+	null: null,
+
 	...Builtin,
 	...LiteralConstructors,
 
