@@ -1,7 +1,6 @@
 const Environment = require('../environment');
 const LiteralConstructors = require('./literal_constructors');
 const Builtin = require('./builtin');
-const envfrom = (b)=>new Environment(b);
 
 const global = new Environment({
 	VER: '1.0.0', // { constant: false, value: '1.0.0', },
