@@ -38,4 +38,17 @@ module.exports = test => {
 	let myclass = new MyClass("classes!");
 	myclass.idk2();
 	`, "c");
+
+	test(`
+	let b = 'JSI'
+	let obj = {
+		idk: {
+			myfunc: fun (a) {
+				print("A"+a);
+			},
+		}
+	}
+
+	obj.idk.myfunc();
+	`, "AJSI");
 }

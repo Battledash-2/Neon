@@ -11,6 +11,9 @@ class Interpreter {
 		this.filename = filename;
 		this.exports = {};
 	}
+	static formatEnv(env) {
+		return env?.record;
+	}
 	eval(exp, env=GlobalEnvironment, exportMode=false) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
 
@@ -98,7 +101,7 @@ class Interpreter {
 				objEnv[name] = this.eval(exp.values[name], env);
 			}
 
-			return objEnv; // new Environment(objEnv);
+			return new Environment(objEnv);
 		}
 
 		// Linked
@@ -110,11 +113,11 @@ class Interpreter {
 			if (exp.with?.type === 'ARRAY' || (typeof to === 'object' && Array.isArray(to))) to = Constructors.Array(to, env);
 			
 			if (exp.other?.type === 'FUNCTION_CALL') {
-				let fenv = new Environment(to?.record ?? to, env);
+				let fenv = new Environment(to.record, env);
 				return this.callFunc(exp.other, fenv);
 			}
 
-			let lookup = exp.other?.type === 'IDENTIFIER' ? ((to instanceof Environment) ? to.nonInheritedlookup(exp.other?.value, this.pos) : to[exp.other?.value]) : this.eval(exp.other, new Environment(to?.record ?? to));
+			let lookup = exp.other?.type === 'IDENTIFIER' ? to.nonInheritedlookup(exp.other?.value, this.pos) : this.eval(exp.other, new Environment(to.record));
 			
 			return lookup;
 		}
