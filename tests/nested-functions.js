@@ -9,4 +9,13 @@ module.exports = test => {
 
 	myFunc("lala");
 	`, "lalapoop");
+
+	test(`
+	fun myFunc() {
+		fun () {
+			'poop';
+		}
+	}
+	myFunc()();
+	`, 'poop');
 }

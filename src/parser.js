@@ -146,9 +146,9 @@ module.exports = class Parser {
 	}
 
 	parenthesizedExpression() {
-		this.advance('LPAREN');
+		this.advance('LPAREN', '(');
 		const body = this.statement();
-		this.advance('RPAREN');
+		this.advance('RPAREN', ')');
 
 		switch (this.next?.type) {
 			case 'LPAREN':
@@ -178,12 +178,18 @@ module.exports = class Parser {
 		const args = this.argumentList('RPAREN');
 		this.advance('RPAREN', ')');
 
-		return {
+		name = {
 			type: 'FUNCTION_CALL',
 			name,
 			arguments: args,
 			position: name?.position,
+		};
+
+		if (this.next?.type === 'LPAREN') {
+			return this.functionCall(name);
 		}
+
+		return name;
 	}
 
 	assignment(name) {

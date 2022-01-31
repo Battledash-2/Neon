@@ -1,9 +1,10 @@
 const testCode = `
-class MyClass() {
-	let a = 5;
+fun myFunc() {
+	fun () {
+		'poop';
+	}
 }
-let myclass = new MyClass();
-myclass.a;
+myFunc()();
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');
