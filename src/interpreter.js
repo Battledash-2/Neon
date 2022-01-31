@@ -148,6 +148,10 @@ class Interpreter {
 		if (isTypeof('CLASS_INSTANCE')) {
 			const cls = this.eval(exp?.name, env);
 
+			if (cls?.constructor?.name?.toLowerCase?.() === 'function') {
+				return new cls(...(exp?.arguments?.map(c=>this.eval(c, env))))?.value;
+			}
+
 			let args = {};
 			for (let pos in cls.arguments) {
 				if (cls.arguments[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);

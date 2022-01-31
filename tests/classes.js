@@ -48,4 +48,9 @@ module.exports = test => {
 
 	obj.idk.poo
 	`, 'hello');
+
+	test(`
+	let myStr = new String("Hello");
+	print(myStr);
+	`, 'Hello');
 }
