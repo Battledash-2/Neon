@@ -24,8 +24,13 @@ Copyright (c) 2022 Battledash-2 (& Neon)\n`);
 
 	const qs = ()=>{ir.question('\u001b[1;97mneon \u001b[1;31m$ \u001b[0m', (r)=>{
 		if (r === 'exit') return ir.close();
-		if (args.showTime) console.time('Run Time');
-		const res = new interpreter('runtime').eval(new parser(new lexer(r), 'runtime'), global);
+		let res;
+		try {
+			if (args.showTime) console.time('Run Time');
+			res = new interpreter('runtime').eval(new parser(new lexer(r), 'runtime'), global);
+		} catch(e) {
+			console.log('\u001b[91m'+e.message+'\u001b[0m');
+		}
 		if (typeof res === 'number') console.log('\u001b[91m'+res+'\u001b[0m');
 		if (typeof res === 'string') console.log('\u001b[92m"'+res+'"\u001b[0m');
 		if (typeof res === 'boolean') console.log('\u001b[31m'+res+'\u001b[0m');
