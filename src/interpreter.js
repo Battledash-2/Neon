@@ -121,7 +121,7 @@ class Interpreter {
 				let fenv = new Environment((to instanceof Environment) ? to.record : to, env);
 				return this.callFunc(exp?.other, fenv);
 			}
-			let pos = exp?.other?.type === 'IDENTIFIER' ? ((to instanceof Environment) ? to.lookup(exp?.other?.value, this.pos) : to[exp?.other?.value]) : this.eval(exp?.other, ((to instanceof Environment) ? to : new Environment(to, env)), false, true);
+			let pos = exp?.other?.type === 'IDENTIFIER' ? ((to instanceof Environment) ? to.lookup(exp?.other?.value, this.pos) : to?.[exp?.other?.value]) : this.eval(exp?.other, ((to instanceof Environment) ? to : new Environment(to, env)), false, true);
 			return pos;
 		}
 
