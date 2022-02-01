@@ -1,0 +1,156 @@
+// print("Hello, world!")
+
+const spec = [
+	['^\.?\d+\.?\d*', 'NUMBER'],
+	['^[\+\-\/\*]', 'OPERATOR'],
+	
+	['^\(', "LPAREN"],
+    ['^\)', "RPAREN"],
+
+	['^\s+', null],
+];
+
+// create the lexer class
+class Lexer(source) {
+	let cursor = 0;
+
+	fun eof() {
+		return cursor >= source.length;
+	}
+	fun match(rgx, str) {
+		let match = str.match(rgx);
+		if (match != null) {
+			cursor += (match[0]).length;
+			return match[0];
+		} else {
+			return null;
+		}
+	}
+	fun nextToken() {
+		if (!eof()) {
+			let str = source.substring(cursor);
+			for (let i = 0; i<spec.length; i++) {
+				let rgx  = spec[i][0];
+				let type = spec[i][1];
+				let match = match(rgx, str)
+
+				if (type == null) {
+                    return nextToken();
+				} else if (match != null) {
+					// print(rgx, type, match);
+					return {
+					    type: type,
+					    value: match,
+				    }
+				}
+			}
+		} else {
+			return null;
+		}
+	}
+}
+
+let lexed = new Lexer('(1+1)*2');
+// 1+(1*2) = 3
+// (1+1)*2 = 4
+
+class Parser(tok) {
+	let next = tok.nextToken();
+
+	fun multiplication() {
+		let left = primary();
+
+		while (next.type == 'OPERATOR' && (next.value == '*' || next.value == '/')) {
+			let op = next.value;
+			advance();
+			let right = primary();
+
+			left = {
+				type: 'OPERATION',
+				operator: op,
+				left: left,
+				right: right,
+			}
+		}
+
+		return left;
+	}
+	fun addition() {
+		let left = multiplication();
+
+		while (next.type == 'OPERATOR' && (next.value == '+' || next.value == '-')) {
+			let op = next.value;
+			advance();
+			let right = multiplication();
+
+			left = {
+				type: 'OPERATION',
+				operator: op,
+				left: left,
+				right: right,
+			}
+		}
+
+		return left;
+	}
+
+	fun paren() {
+		advance();
+		let r = addition();
+		advance();
+		return r;
+	}
+
+	fun primary() {
+		if (next.type == 'NUMBER') {
+			let r = new Number(next.value);
+			next = tok.nextToken();
+			return {
+				type: 'NUMBER',
+				value: r,
+			};
+		} else if (next.type == 'LPAREN') {
+			return paren();
+		}
+	}
+
+	fun advance() {
+		next = tok.nextToken();
+		return next;
+	}
+	
+	fun program() {
+		return {
+			type: 'PROGRAM',
+			body: addition(),
+		}
+	}
+}
+
+let parsed = new Parser(lexed).program().body;
+
+class Interpreter() {
+	fun eval(tok) {
+		if (tok.type == 'OPERATION') {
+			return operation(eval(tok.left), eval(tok.right), tok.operator);
+		}
+		if (tok.type == 'NUMBER') {
+			return tok.value;
+		}
+	}
+	fun operation(left, right, oper) {
+		if (oper == '+') {
+			return left + right;
+		} else if (oper == '-') {
+			return left - right;
+		} else if (oper == '*') {
+			return left * right;
+		} else if (oper == '/') {
+			return left / right;
+		}
+	}
+}
+
+let interpreter = new Interpreter();
+let result = interpreter.eval(parsed);
+print(result);
