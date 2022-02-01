@@ -201,9 +201,9 @@ class Interpreter {
 		// IF-Statements
 		if (isTypeof('CONDITION')) {
 			if (this.eval(exp.statement, env)) {
-				return this.evalBlock(exp.pass, env, stopOn);
+				return this.evalBlock(exp.pass, env);
 			} else if(typeof exp.fail !== 'undefined') {
-				return this.evalBlock(exp.fail, env, stopOn);
+				return this.evalBlock(exp.fail, env);
 			} else {
 				return false;
 			}
@@ -216,9 +216,7 @@ class Interpreter {
 			let res;
 
 			while (this.eval(exp.execute[0], loopEnv)) {
-				let r = this.evalBlock(exp.pass, loopEnv, 'BREAK');
-				if (r instanceof Internal && r?.get?.()?.type === 'BREAK') { res = r?.get?.()?.val; break; };
-				res = r;
+				res = this.evalBlock(exp.pass, loopEnv);
 				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 			}
 
@@ -252,42 +250,36 @@ class Interpreter {
 		// if (isTypeof('BREAK')) {
 		// 	return new Internal('break');
 		// }
-		if (isTypeof('RETURN')) {
-			return new Internal({
-				type: 'return',
-				value: this.eval(exp.value, env),
-			});
-		}
+		// if (isTypeof('RETURN')) {
+		// 	return new Internal({
+		// 		type: 'return',
+		// 		value: this.eval(exp.value, env),
+		// 	});
+		// }
 
 		// Unknown
 		throw new Error(`Unexpected AST '${exp.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 	}
 
-	evalLoopNB(block, env, stn) {
+	evalLoopNB(block, env) {
 		let res;
 		if (Array.isArray(block)) {
 			for (let item of block) {
-				if (item.type === stn) {
-					return new Internal({val: typeof item?.value !== 'undefined' ? this.eval(item?.value, env) : re, type: stn}); // new Internal(stn);
-				}
-				res = this.eval(item, env, false, false, stn);
+				res = this.eval(item, env);
 			}
 		} else {
-			if (block.type === stn) {
-				return new Internal({val: typeof block?.value !== 'undefined' ? this.eval(block.value, env) : res, type: stn}); // new Internal(stn);
-			}
-			res = this.eval(block, env, false, false, stn);
+			res = this.eval(block, env);
 		}
 		return res;
 	}
 
-	evalLoop(block, env, stn) {
-		return this.evalLoopNB(block.body, env, stn);
+	evalLoop(block, env) {
+		return this.evalLoopNB(block.body, env);
 	}
 
-	evalBlock(blk, env, stn) {
+	evalBlock(blk, env) {
 		const blockEnv = new Environment({}, env);
-		return this.evalLoop(blk, blockEnv, stn);
+		return this.evalLoop(blk, blockEnv);
 	}
 
 	callFunc(exp, env) {
