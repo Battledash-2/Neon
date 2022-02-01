@@ -13,4 +13,13 @@ module.exports = test => {
         }
         adv();
     `, 15);
+
+	test(`
+        fun test() {
+			return {
+				e: 'poop'
+			}
+		}
+		test().es;
+    `, 'poop');
 }

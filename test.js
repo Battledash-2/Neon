@@ -1,5 +1,10 @@
 const testCode = `
-obj.poo == 's' || obj.poo == obj.pee
+// print("Hello, world!")
+class poo() {
+	pee
+}
+
+print(new Parser(lexed));
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');

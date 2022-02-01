@@ -215,6 +215,8 @@ module.exports = class Parser {
 
 		if (this.next?.type === 'LPAREN') {
 			return this.functionCall(name);
+		} else if (this.next?.type === 'OBJ_SEPERATOR') {
+			return this.linked(name);
 		}
 
 		return name;
