@@ -22,6 +22,7 @@ class Interpreter {
 
 		if (typeof exp === 'number') return exp;
 		if (typeof exp === 'string') return exp;
+		if (typeof exp === 'boolean') return exp;
 		if (Array.isArray(exp)) return exp;
 
 		this.pos = {
