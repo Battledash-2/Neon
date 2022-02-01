@@ -217,7 +217,7 @@ class Interpreter {
 
 			while (this.eval(exp.execute[0], loopEnv)) {
 				let r = this.evalBlock(exp.pass, loopEnv, 'BREAK');
-				if (r instanceof Internal && r?.get?.() === 'break') break;
+				if (r instanceof Internal && r?.get?.()?.type === 'BREAK') { res = r?.get?.()?.val; break; };
 				res = r;
 				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 			}
@@ -248,10 +248,10 @@ class Interpreter {
 			return res;
 		}
 
-		// Break / Return
-		if (isTypeof('BREAK')) {
-			return new Internal('break');
-		}
+		// // Break / Return
+		// if (isTypeof('BREAK')) {
+		// 	return new Internal('break');
+		// }
 		if (isTypeof('RETURN')) {
 			return new Internal({
 				type: 'return',
@@ -268,13 +268,13 @@ class Interpreter {
 		if (Array.isArray(block)) {
 			for (let item of block) {
 				if (item.type === stn) {
-					return new Internal('break');
+					return new Internal({val: typeof item?.value !== 'undefined' ? this.eval(item?.value, env) : re, type: stn}); // new Internal(stn);
 				}
 				res = this.eval(item, env, false, false, stn);
 			}
 		} else {
 			if (block.type === stn) {
-				return new Internal('break');
+				return new Internal({val: typeof block?.value !== 'undefined' ? this.eval(block.value, env) : res, type: stn}); // new Internal(stn);
 			}
 			res = this.eval(block, env, false, false, stn);
 		}
@@ -323,7 +323,7 @@ class Interpreter {
 			}
 			res = this.eval(block, funcEnv, false, false, 'RETURN');
 		}
-		return res;
+		return (res instanceof Internal) ? res.get().val : res;
 		// return this.evalLoop(func.body, funcEnv, );
 	}
 

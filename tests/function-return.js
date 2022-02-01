@@ -2,11 +2,10 @@ module.exports = test => {
 	test(`
 	let a = 'foo';
 	fun b() {
-		return 'e' + a;
+		return a+'foo';
 		a = 'bar';
 	}
 	a;
 	b();
-	print(a);
-	`, 'foo');
+	`, 'foofoo');
 }
