@@ -289,12 +289,18 @@ module.exports = class Parser {
 		const args = this.argumentList('RPAREN');
 		this.advance('RPAREN', ')');
 
-		return {
+		let rv = {
 			type: 'CLASS_INSTANCE',
 			name,
 			arguments: args,
 			position,
 		};
+
+		if (this.next?.type === 'OBJ_SEPERATOR') {
+			return this.linked(rv);
+		}
+
+		return rv;
 	}
 
 	classDefinition() {

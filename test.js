@@ -1,10 +1,8 @@
 const testCode = `
-// print("Hello, world!")
 class poo() {
-	pee
+	let i = 'e'
 }
-
-print(new Parser(lexed));
+new poo().i
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');
