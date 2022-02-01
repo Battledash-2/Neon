@@ -1,10 +1,5 @@
 const testCode = `
-fun myFunc() {
-	fun () {
-		'poop';
-	}
-}
-myFunc()();
+true.hd == poo || false.hd == pee
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');

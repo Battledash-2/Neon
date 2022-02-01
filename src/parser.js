@@ -53,13 +53,38 @@ module.exports = class Parser {
 		return this.primaryStatement();
 	}
 
-	logicalExpression() {
-		let left = this.unary();
+	logOr() {
+		return this._logical('unary', '||');
+	}
+	logAnd() {
+		return this._logical('logOr', '&&');
+	}
+	logMEq() {
+		return this._logical('logAnd', '>=');
+	}
+	logM() {
+		return this._logical('logMEq', '>');
+	}
+	logLEq() {
+		return this._logical('logM', '<=');
+	}
+	logL() {
+		return this._logical('logLEq', '<');
+	}
+	logNoteq() {
+		return this._logical('logL', '!=');
+	}
+	logEqeq() {
+		return this._logical('logNoteq', '==');
+	}
 
-		while (this.next?.type === 'CONDITION_OPERATOR') {
+	_logical(next, type) {
+		let left = this[next]();
+
+		while (this.next?.type === 'CONDITION_OPERATOR' && this.next?.value === type) {
 			let operator = this.next.value;
 			this.advance('CONDITION_OPERATOR');
-			let right = this.unary();
+			let right = this[next]();
 
 			left = {
 				type: 'LOGICAL',
@@ -71,6 +96,10 @@ module.exports = class Parser {
 		}
 
 		return left;
+	}
+
+	logicalExpression() {
+		return this.logEqeq();
 	}
 
 	variableExpression() {
