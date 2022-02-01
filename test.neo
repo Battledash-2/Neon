@@ -1,0 +1,55 @@
+// print("Hello, world!")
+
+const spec = [
+	['^\.?\d+\.?\d*', 'NUMBER'],
+	['^[\+\-\/\*]', 'OPERATOR'],
+	
+	['^\(', "LPAREN"],
+    ['^\)', "RPAREN"],
+
+	['^\s+', null],
+];
+
+// create the lexer class
+class Lexer(source) {
+	let cursor = 0;
+
+	fun eof() {
+		return cursor >= source.length;
+	}
+	fun match(rgx, str) {
+		let match = str.match(rgx);
+		if (match != null) {
+			cursor += (match[0]).length;
+			return match[0];
+		} else {
+			return null;
+		}
+	}
+	fun nextToken() {
+		if (!eof()) {
+			let str = source.substring(cursor);
+			for (let i = 0; i<spec.length; i++) {
+				// print(spec[i]);
+				let rgx  = spec[i][0];
+				let type = spec[i][1];
+				let match = match(rgx, str)
+                // i give up on the work around this is pain
+				if (type == null) {
+                    return nextToken();
+				} else if (match != null) {
+					// print(rgx, type, match);
+					return {
+					    type: type,
+					    value: match,
+				    }
+				}
+			}
+		} else {
+			return null;
+		}
+	}
+}
+
+let lexed = new Lexer('20*1-33+1');
+print(lexed.nextToken(), lexed.nextToken());

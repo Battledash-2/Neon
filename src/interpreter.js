@@ -19,10 +19,10 @@ class Interpreter {
 	}
 	eval(exp, env=GlobalEnvironment, exportMode=false, preventInherit=false, stopOn) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
-
-		if (typeof exp === 'number') return exp;
-		if (typeof exp === 'string') return exp;
-		if (typeof exp === 'boolean') return exp;
+		if (exp == null
+			|| typeof exp === 'number'
+			|| typeof exp === 'string'
+			|| typeof exp === 'boolean') return exp;
 		if (Array.isArray(exp)) return exp;
 
 		this.pos = {
@@ -63,11 +63,11 @@ class Interpreter {
 			// Array
 			if (exp?.name?.type !== 'IDENTIFIER') {
 				let arr = this.eval(exp?.name?.array, env);
-				// if (Array.isArray(arr)) {
-				arr[this.eval(exp?.name?.select, env)] = this.eval(exp?.value, env);
-				// } else {
-				//	arr.assign(this.eval(exp?.name?.select, env), this.eval(exp?.value, env), this.pos);
-				// }
+				if (Array.isArray(arr)) {
+					arr[this.eval(exp?.name?.select, env)] = this.eval(exp?.value, env);
+				} else {
+					arr.assign(this.eval(exp?.name?.select, env), this.eval(exp?.value, env), this.pos);
+				}
 				
 				return this.eval(exp?.value, env);
 			}
@@ -106,7 +106,7 @@ class Interpreter {
 				objEnv[name] = this.eval(exp.values[name], env);
 			}
 
-			return objEnv; // new Environment(objEnv);
+			return new Environment(objEnv);
 		}
 
 		// Linked
@@ -254,8 +254,13 @@ class Interpreter {
 			return new Internal('return', this.eval(exp.value, env));
 		}
 
+		// Objects / Classes
+		if (exp instanceof Environment) {
+			return exp;
+		}
+
 		// Unknown
-		throw new Error(`Unexpected AST '${exp.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+		throw new Error(`Unexpected AST '${exp?.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 	}
 
 	evalLoopNB(block, env) {
