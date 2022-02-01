@@ -53,14 +53,11 @@ module.exports = class Parser {
 		return this.primaryStatement();
 	}
 
-	logOr() {
-		return this._logical('unary', '||');
-	}
-	logAnd() {
-		return this._logical('logOr', '&&');
+	logNoteq() {
+		return this._logical('unary', '!=');
 	}
 	logMEq() {
-		return this._logical('logAnd', '>=');
+		return this._logical('logNoteq', '>=');
 	}
 	logM() {
 		return this._logical('logMEq', '>');
@@ -71,13 +68,15 @@ module.exports = class Parser {
 	logL() {
 		return this._logical('logLEq', '<');
 	}
-	logNoteq() {
-		return this._logical('logL', '!=');
-	}
 	logEqeq() {
-		return this._logical('logNoteq', '==');
+		return this._logical('logL', '==');
 	}
-
+	logAnd() {
+		return this._logical('logEqeq', '&&');
+	}
+	logOr() {
+		return this._logical('logAnd', '||');
+	}
 	_logical(next, type) {
 		let left = this[next]();
 
@@ -99,7 +98,7 @@ module.exports = class Parser {
 	}
 
 	logicalExpression() {
-		return this.logEqeq();
+		return this.logOr();
 	}
 
 	variableExpression() {

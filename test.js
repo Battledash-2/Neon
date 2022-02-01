@@ -1,5 +1,5 @@
 const testCode = `
-true.hd == poo || false.hd == pee
+obj.poo == 's' || obj.poo == obj.pee
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');
