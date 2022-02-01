@@ -6,15 +6,9 @@ const Environment = require('./environment');
 const Constructors = require('./core/constructors');
 
 class Internal {
-	constructor(val) {
-		this.value = val;
-	}
-	get() {
-		return this.value;
-	}
-	set(v) {
-		this.value = v;
-		return true;
+	constructor(type, value) {
+		this.type = type;
+		this.value = value;
 	}
 }
 
@@ -216,7 +210,12 @@ class Interpreter {
 			let res;
 
 			while (this.eval(exp.execute[0], loopEnv)) {
-				res = this.evalBlock(exp.pass, loopEnv);
+				let tres = this.evalBlock(exp.pass, loopEnv);
+				if (tres instanceof Internal && (tres.type === 'break' || tres.type === 'return')) {
+					if (tres.type === 'break') { res = tres.value; break };
+					if (tres.type === 'return') return tres;
+				}
+				res = tres;
 				this.evalLoopNB(exp.execute.slice(1), loopEnv);
 			}
 
@@ -247,15 +246,12 @@ class Interpreter {
 		}
 
 		// // Break / Return
-		// if (isTypeof('BREAK')) {
-		// 	return new Internal('break');
-		// }
-		// if (isTypeof('RETURN')) {
-		// 	return new Internal({
-		// 		type: 'return',
-		// 		value: this.eval(exp.value, env),
-		// 	});
-		// }
+		if (isTypeof('BREAK')) {
+			return new Internal('break', null);
+		}
+		if (isTypeof('RETURN')) {
+			return new Internal('return', this.eval(exp.value, env));
+		}
 
 		// Unknown
 		throw new Error(`Unexpected AST '${exp.type}' (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
@@ -265,10 +261,20 @@ class Interpreter {
 		let res;
 		if (Array.isArray(block)) {
 			for (let item of block) {
-				res = this.eval(item, env);
+				let tres = this.eval(item, env);
+				if (tres instanceof Internal && (tres.type === 'break' || tres.type === 'return')) {
+					if (tres.type === 'break') return new Internal('break', (typeof res !== 'undefined') ? res : null);
+					if (tres.type === 'return') return tres;
+				}
+				res = tres;
 			}
 		} else {
-			res = this.eval(block, env);
+			let tres = this.eval(block, env);
+			if (tres instanceof Internal && (tres.type === 'break' || tres.type === 'return')) {
+				if (tres.type === 'break') return new Internal('break', (typeof res !== 'undefined') ? res : null);
+				if (tres.type === 'return') return tres;
+			}
+			res = tres;
 		}
 		return res;
 	}
@@ -300,22 +306,11 @@ class Interpreter {
 		// let funcEnv = new Environment(args, env);
 		let funcEnv = new Environment(args, func.env);
 		// console.log('f', funcEnv.parent.record.myObj)
-		let block = func.body.body;
-		let res;
-		if (Array.isArray(block)) {
-			for (let item of block) {
-				if (item.type === 'RETURN') {
-					return this.eval(item.value, funcEnv);
-				}
-				res = this.eval(item, funcEnv, false, false, 'RETURN');
-			}
-		} else {
-			if (block.type === 'RETURN') {
-				return this.eval(block.value, funcEnv);
-			}
-			res = this.eval(block, funcEnv, false, false, 'RETURN');
+		let res = this.evalLoop(func.body, funcEnv);
+		if (res instanceof Internal && res.type === 'return') {
+			return this.eval(res.value, funcEnv);
 		}
-		return (res instanceof Internal) ? res.get().val : res;
+		return res;
 		// return this.evalLoop(func.body, funcEnv, );
 	}
 
