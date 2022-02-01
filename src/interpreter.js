@@ -1,7 +1,7 @@
-// const fs = require('fs');
-// const path = require('path');
-// const Lexer = require('./lexer');
-// const Parser = require('./parser');
+const fs = require('fs');
+const path = require('path');
+const Lexer = require('./lexer');
+const Parser = require('./parser');
 const Environment = require('./environment');
 const Constructors = require('./core/constructors');
 
@@ -225,12 +225,28 @@ class Interpreter {
 
 		// Imports
 		if (isTypeof('IMPORT')) {
-			throw 'unimplemented';
+			// throw 'unimplemented';
+			let file  = exp.file.value;
+			let fname = path.parse(file).name;
+
+			if (!fs.existsSync(path.join(process.cwd(), file))) throw new ReferenceError(`Attempt to import file '${file}' which does not exist`);
+
+			let fcontent = fs.readFileSync(path.join(process.cwd(), file));
+			let lexed  = new Lexer(fcontent, file);
+			let parsed = new Parser(lexed, file);
+			let runner = new Interpreter(file);
+
+			let fileEnv = require('./core/global');
+			let resultEnv = runner.eval(parsed, fileEnv, true);
+
+			env.define(fname, new Environment(resultEnv));
+			return resultEnv;
 		}
 
 		// Export
 		if (isTypeof('EXPORT')) {
-			throw 'unimplemented';
+			this.exports[exp.value.value] = this.eval(exp.value);
+			return true;
 		}
 
 		// Block

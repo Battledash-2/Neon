@@ -33,6 +33,7 @@ const tests = [
 	require('./module-test'),
 	require('./classes'),
 	require('./function-return'),
+	require('./imports'),
 ];
 
 const manualTests = [

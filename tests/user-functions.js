@@ -20,6 +20,6 @@ module.exports = test => {
 				e: 'poop'
 			}
 		}
-		test().es;
+		test().e;
     `, 'poop');
 }
