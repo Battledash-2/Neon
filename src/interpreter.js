@@ -353,17 +353,17 @@ class Interpreter {
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
 		switch (exp.operator) {
 			case '=':
-				if (env instanceof Environment) {
-					return env.assign(exp?.name?.value, this.eval(exp?.value, env), this.pos);
-				} else {
-					return env[exp?.name?.value] = this.eval(exp?.value, env);
-				}
+				if (env instanceof Environment) return env.assign(exp?.name?.value, this.eval(exp?.value, env), this.pos);
+				return env[exp?.name?.value] = this.eval(exp?.value, env);
 			case '+=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env), this.pos);
+				if (env instanceof Environment) return env.assign(exp?.name?.value, env.lookup(exp.name.value) + this.eval(exp?.value, env), this.pos);
+				env[exp?.name?.value] += this.eval(exp?.value, env);
 			case '-=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) - this.eval(exp?.value, env), this.pos);
+				if (env instanceof Environment) return env.assign(exp?.name?.value, env.lookup(exp.name.value) - this.eval(exp?.value, env), this.pos);			
+				env[exp?.name?.value] -= this.eval(exp?.value, env);
 			case '*=':
-				return env.assign(exp?.name?.value, env.lookup(exp.name.value) * this.eval(exp?.value, env), this.pos);
+				if (env instanceof Environment) return env.assign(exp?.name?.value, env.lookup(exp.name.value) * this.eval(exp?.value, env), this.pos);
+				env[exp?.name?.value] *= this.eval(exp?.value, env);
 		}
 	}
 
