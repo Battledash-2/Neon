@@ -1,0 +1,9 @@
+fun e() {
+	print('foo', 'bar')
+}
+
+fun e2() {
+	e();
+}
+
+export e2;
