@@ -19,5 +19,11 @@ exp.Array = class {
 		return consreturn([...args]);
 	}
 }
+// new Boolean('false');
+exp.Boolean = class {
+	constructor(b) {
+		return consreturn(Boolean(b));
+	}
+}
 
 module.exports = exp;
