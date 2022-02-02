@@ -233,9 +233,19 @@ class Interpreter {
 			let file  = exp.file.value;
 			let fname = path.parse(file).name;
 
-			if (!fs.existsSync(path.join(process.cwd(), file))) throw new ReferenceError(`Attempt to import file '${file}' which does not exist`);
+			let fcontent;
 
-			let fcontent = fs.readFileSync(path.join(process.cwd(), file));
+			if (fs.existsSync(path.join(process.cwd(), file))) {
+				fcontent = fs.readFileSync(path.join(process.cwd(), file));
+			} else if (fs.existsSync(path.join(__dirname, 'core', 'modules', fname+'.js'))) {
+				const renv = require(path.join(__dirname, 'core', 'modules', fname+'.js'));
+				return renv;
+			} else if (fs.existsSync(path.join(process.cwd(), '.modules', file))) {
+				fcontent = fs.readFileSync(path.join(process.cwd(), '.modules', file));
+			} else {
+				throw new ReferenceError(`Attempt to import file '${file}' which does not exist`);
+			}
+
 			let lexed  = new Lexer(fcontent, file);
 			let parsed = new Parser(lexed, file);
 			let runner = new Interpreter(file);
