@@ -1,5 +1,7 @@
 const assert = require('assert');
 
+const env = require('../src/core/global');
+
 const Interpreter = require('../src/interpreter');
 const Lexer = require('../src/lexer');
 const Parser = require('../src/parser');
@@ -8,7 +10,7 @@ const interpreter = new Interpreter();
 
 function test(code, expec) {
     const ast = new Parser(new Lexer(code));
-    assert.strictEqual(interpreter.eval(ast), expec);
+    assert.strictEqual(interpreter.eval(ast, env.create()), expec);
 }
 
 const tests = [

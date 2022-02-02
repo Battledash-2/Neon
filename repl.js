@@ -1,4 +1,4 @@
-const global = require('./src/core/global');
+const global = require('./src/core/global').default;
 
 const lexer = require('./src/lexer');
 const parser = require('./src/parser');

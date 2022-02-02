@@ -1,6 +1,6 @@
 module.exports = test => {
 	test(`
-	import "tests/imports.neo";
-	imports.foo;
+	let importz = import "tests/imports.neo";
+	importz.gibdu;
 	`, 'bar');
 }

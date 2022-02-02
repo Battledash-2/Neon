@@ -1,9 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+
 const Lexer = require('./lexer');
 const Parser = require('./parser');
+
 const Environment = require('./environment');
 const Constructors = require('./core/constructors');
+
+const ENVConstruct = require('./core/global');
 
 class Internal {
 	constructor(type, value) {
@@ -236,16 +240,16 @@ class Interpreter {
 			let parsed = new Parser(lexed, file);
 			let runner = new Interpreter(file);
 
-			let fileEnv = require('./core/global');
+			let fileEnv = ENVConstruct.create();
 			let resultEnv = runner.eval(parsed, fileEnv, true);
 
-			env.define(fname, new Environment(resultEnv));
+			//env.define(fname, new Environment(resultEnv));
 			return resultEnv;
 		}
 
 		// Export
 		if (isTypeof('EXPORT')) {
-			this.exports[exp.value.value] = this.eval(exp.value);
+			this.exports[exp.value.value] = this.eval(exp.value, env);
 			return true;
 		}
 
@@ -412,6 +416,6 @@ class Interpreter {
 	}
 }
 
-const GlobalEnvironment = require('./core/global');
+const GlobalEnvironment = ENVConstruct.default;
 
 module.exports = Interpreter;
