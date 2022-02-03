@@ -236,9 +236,9 @@ module.exports = class Parser {
 		};
 	}
 
-	linked(w) {
+	linked(w,a) {
 		this.advance('OBJ_SEPERATOR', '.');
-		let other = this.identifier();
+		let other = this.identifier(a);
 		
 		return {
 			type: 'LINKED',
@@ -266,7 +266,7 @@ module.exports = class Parser {
 		
 		switch (this.next?.type) {
 			case 'OBJ_SEPERATOR':
-				return this.linked(identifier);
+				return this.linked(identifier, allowFunc);
 			case 'LBRACK':
 				return this.arraySelect(identifier);
 			case 'ASSIGNMENT_SS':
