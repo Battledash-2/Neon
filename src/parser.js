@@ -40,7 +40,7 @@ module.exports = class Parser {
 		if (this.next?.type === 'OPERATOR' && this.tokens.isAdditive(this.next.value)) {
 			op = this.next;
 			this.advance('OPERATOR');
-			num = this.statement();
+			num = this.primaryStatement();
 		}
 
 		if (op != null) return {
