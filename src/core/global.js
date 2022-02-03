@@ -18,9 +18,13 @@ const glbl = {
 	// -- Types
 	isNaN(arg) { return isNaN(arg); },
 
+	// -------------
 	// -- Functional
-	setTimeout(arg, time) { setTimeout(arg, time); },
-	setInterval(arg, time) { setInterval(arg, time); },
+	// - TIMEOUTS
+	timeout(arg, time) { return setTimeout(arg, time); },
+	interval(arg, time) { return setInterval(arg, time); },
+
+	deleteInterval(arg) { return clearInterval(arg); },
 };
 
 const global = new Environment({...glbl});
