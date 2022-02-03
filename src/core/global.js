@@ -12,19 +12,31 @@ const glbl = {
 	// ---------------------------
 	// Native
 	// -- Console
-	print(...args) { console.log(...args); return args.join(" "); },
-	clear: ()=>console.clear(),
+	print(_env, ...args) { console.log(...args); return args.join(" "); },
+	clear: (_env)=>console.clear(),
 
 	// -- Types
-	isNaN(arg) { return isNaN(arg); },
+	isNaN(_env, arg) { return isNaN(arg); },
 
 	// -------------
 	// -- Functional
 	// - TIMEOUTS
-	timeout(arg, time) { return setTimeout(arg, time); },
-	interval(arg, time) { return setInterval(arg, time); },
+	timeout(_env, arg, time) { return setTimeout(arg.exec, time); },
+	interval(_env, arg, time) { return setInterval(arg.exec, time); },
 
-	deleteInterval(arg) { return clearInterval(arg); },
+	deleteInterval(_env, arg) { return clearInterval(arg); },
+
+	// -------------
+	// - ENVIRONMENTS
+	getfenv(_e, f) { 
+		if (typeof f === 'undefined') return _e;
+		return f?.raw?.value?.env;
+	},
+	setfenv(_e, f, o) {
+		if (typeof o === 'undefined') return _e = f;
+		if (typeof f?.raw === 'undefined') return f = o;
+		return f.raw.value.env = o;
+	}
 };
 
 const global = new Environment({...glbl});

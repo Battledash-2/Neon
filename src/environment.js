@@ -11,11 +11,16 @@ class Environment {
 		return value;
 	}
 
-	assign(name, value, pos) {
+	_assign(name, value, pos) {
 		let env = this.resolve(name, pos);
 		if (this.isConstant(name, pos)) throw new TypeError(`Cannot overwrite constant variable '${name}' (${pos.filename}:${pos.line}:${pos.cursor})`);
-		this.resolve(name, pos).record[name] = value;
+		env.record[name] = value;
 		return value;
+	}
+
+	assign(name, value, pos) {
+		if (this.varExists(name)) return this._assign(name, value, pos);
+		return this.define(name, value, pos, false);
 	}
 
 	lookup(name, pos) {
@@ -34,7 +39,7 @@ class Environment {
 
 	varExists(name) {
 		if (this.record.hasOwnProperty(name)) return true;
-		if (this.parent == null) return false;
+		if (this.parent == null || !(this.parent instanceof Environment)) return false;
 
 		return this.parent.varExists(name);
 	}

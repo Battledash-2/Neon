@@ -1,5 +1,5 @@
 # 🔆 Neon Lang 🟡
-#### V2.0.0
+#### V2.1.2
 
 ## What is Neon? (ℹ)
 ### Neon is a public and open source language (under the MIT license ©).
@@ -16,7 +16,8 @@
 2) Run `node . <MODE: [-f: File, -c: Console, Default: -c]> <MODE==FILE?FNAME: [-t: Show Exec Time]>`
 
 ## 📃 Todo 💹
-- Everything is finished...
+- Proxies (like the Javascript `new Proxy(<OBJECT>, <PROXY>))` and the Lua `setmetatable(<OBJECT>, <PROXY>)`) 
+- ObjectPrototype.defineProperty (`<OBJECT>.defineProperty(<NAME>, <FAKE-ISH PROXY: VALUE>)`)
 
 ## 🏁 Finished 🔚
 - [x] OOP support (still missing `extends` keyword) (Classes)

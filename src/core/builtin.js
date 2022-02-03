@@ -5,13 +5,13 @@ const exp = {};
 // math module
 exp.Math = {
 	PI: Math.PI,
-	sin: (n)=>Math.sin(n),
-	cos: (n)=>Math.cos(n),
-	pow: (n,e)=>Math.pow(n, e),
+	sin: (_e,n)=>Math.sin(n),
+	cos: (_e,n)=>Math.cos(n),
+	pow: (_e,n,e)=>Math.pow(n, e),
 };
 // process module
 exp.process = {
-	exit: (code)=>process.exit(code),
+	exit: (_e,code)=>process.exit(code),
 };
 
 module.exports = exp;

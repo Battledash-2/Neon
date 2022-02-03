@@ -117,6 +117,8 @@ class Interpreter {
 		if (isTypeof('LINKED')) {
 			let to = this.eval(exp?.with, env, false, preventInherit);
 
+			if (to instanceof Internal) throw new ReferenceError(`Cannot read properties from internal objects (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+
 			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to, env);
 			if (exp.with?.type === 'NUMBER' || typeof to === 'number') to = Constructors.Number(to, env);
 			if (exp.with?.type === 'ARRAY' || (typeof to === 'object' && Array.isArray(to))) to = Constructors.Array(to, env);
@@ -143,13 +145,13 @@ class Interpreter {
 			const args = exp?.arguments;
 			const body = exp?.body;
 
-			let func = {
+			let func = new Internal('function', {
 				isClass: false,
 				isFunction: true,
 				arguments: args,
 				body,
 				env,
-			}
+			});
 
 			if (fname != null) env.define(fname, func, this.pos);
 			return func;
@@ -159,11 +161,14 @@ class Interpreter {
 		// Classes (OOP)
 		// Class instance
 		if (isTypeof('CLASS_INSTANCE')) {
-			const cls = this.eval(exp?.name, env);
+			let cls = this.eval(exp?.name, env);
 
-			if (cls?.constructor?.name?.toLowerCase?.() === 'function') {
+			if (typeof cls === 'function') {
 				return new cls(...(exp?.arguments?.map(c=>this.eval(c, env))))?.value;
 			}
+
+			if (!(cls instanceof Internal) || (cls?.type !== 'class' && cls?.type !== 'function')) throw new Error(`Reference item is not a class`);
+			cls = cls.value;
 
 			let args = {};
 			for (let pos in cls.arguments) {
@@ -182,13 +187,13 @@ class Interpreter {
 			const args = exp?.arguments;
 			const body = exp?.body;
 
-			let cls = {
+			let cls = new Internal('class', {
 				isClass: true,
 				isFunction: false,
 				arguments: args,
 				body,
 				env: new Environment(env.record, env.parent),
-			}
+			});
 
 			if (fname != null) env.define(fname, cls, this.pos);
 			return cls;
@@ -345,6 +350,9 @@ class Interpreter {
 		}
 
 		// User functions
+		if (!(func instanceof Internal) || (func?.type !== 'class' && func?.type !== 'function')) throw new Error(`Reference item is not a function (${func instanceof Internal}, ${func.type})`);
+		func = func.value;
+
 		let args = {};
 		for (let pos in func.arguments) {
 			if (func.arguments[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
@@ -363,43 +371,51 @@ class Interpreter {
 	}
 
 	handleBuiltinFunc(func, exp, env) {
-		return func(...exp?.arguments.map(val=>{
+		return func(env, ...exp?.arguments.map(val=>{
 			let r = this.eval(val, env);
 
-			if (r.isFunction) {
-				let fargs = r.arguments;
-				let fenv = r.env;
-				let body = r.body;
-				r = (...arg)=>{
-					let args = {};
-					for (let pos in fargs) {
-						if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-						args[fargs[pos].value] = arg[pos];
-					}
-					let funcEnv = new Environment(args, fenv);
-					let res = this.evalLoop(body, funcEnv);
-					if (res instanceof Internal && res.type === 'return') {
-						return this.eval(res.value, funcEnv);
-					}
-					return res;
+			if (r?.value?.isFunction == true) {
+				let raw = r;
+				let fargs = r.value.arguments;
+				let fenv = r.value.env;
+				let body = r.value.body;
+				r = {
+					exec: (...arg)=>{
+						let args = {};
+						for (let pos in fargs) {
+							if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+							args[fargs[pos].value] = arg[pos];
+						}
+						let funcEnv = new Environment(args, fenv);
+						let res = this.evalLoop(body, funcEnv);
+						if (res instanceof Internal && res.type === 'return') {
+							return this.eval(res.value, funcEnv);
+						}
+						return res;
+					},
+					raw,
 				}
 			}
-			if (r.isClass) {
-				let cargs = r.arguments;
-				let cenv = r.env;
-				let cbody = r.body;
-				r = class {
-					constructor(...arg) {
-						let args = {};
-						for (let pos in cargs) {
-							if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-							args[cargs[pos].value] = arg[pos];
-						}
+			if (r?.value?.isClass) {
+				let raw = r;
+				let cargs = r.value.arguments;
+				let cenv = r.value.env;
+				let cbody = r.value.body;
+				r = {
+					exec: class {
+						constructor(...arg) {
+							let args = {};
+							for (let pos in cargs) {
+								if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+								args[cargs[pos].value] = arg[pos];
+							}
 
-						let classEnv = new Environment(args, cenv);
-						this.evalLoop(cbody, classEnv);
-						return classEnv;
-					}
+							let classEnv = new Environment(args, cenv);
+							this.evalLoop(cbody, classEnv);
+							return classEnv;
+						}
+					},
+					raw,
 				}
 			}
 
