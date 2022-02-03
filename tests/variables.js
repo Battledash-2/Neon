@@ -1,8 +1,8 @@
 module.exports = t => {
     // get
-    t(`
-    VER
-    `, '1.0.0');
+    // t(`
+    // VER
+    // `, '1.0.0');
 
     // set
     t(`

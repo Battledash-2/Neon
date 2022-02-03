@@ -144,6 +144,8 @@ class Interpreter {
 			const body = exp?.body;
 
 			let func = {
+				isClass: false,
+				isFunction: true,
 				arguments: args,
 				body,
 				env,
@@ -181,6 +183,8 @@ class Interpreter {
 			const body = exp?.body;
 
 			let cls = {
+				isClass: true,
+				isFunction: false,
 				arguments: args,
 				body,
 				env: new Environment(env.record, env.parent),
@@ -337,7 +341,7 @@ class Interpreter {
 		
 		// Native functions
 		if (typeof func === 'function') {
-			return func(...exp?.arguments.map(val=>this.eval(val, env)));
+			return this.handleBuiltinFunc(func, exp, env);
 		}
 
 		// User functions
@@ -356,6 +360,51 @@ class Interpreter {
 		}
 		return res;
 		// return this.evalLoop(func.body, funcEnv, );
+	}
+
+	handleBuiltinFunc(func, exp, env) {
+		return func(...exp?.arguments.map(val=>{
+			let r = this.eval(val, env);
+
+			if (r.isFunction) {
+				let fargs = r.arguments;
+				let fenv = r.env;
+				let body = r.body;
+				r = (...arg)=>{
+					let args = {};
+					for (let pos in fargs) {
+						if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+						args[fargs[pos].value] = arg[pos];
+					}
+					let funcEnv = new Environment(args, fenv);
+					let res = this.evalLoop(body, funcEnv);
+					if (res instanceof Internal && res.type === 'return') {
+						return this.eval(res.value, funcEnv);
+					}
+					return res;
+				}
+			}
+			if (r.isClass) {
+				let cargs = r.arguments;
+				let cenv = r.env;
+				let cbody = r.body;
+				r = class {
+					constructor(...arg) {
+						let args = {};
+						for (let pos in cargs) {
+							if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+							args[cargs[pos].value] = arg[pos];
+						}
+
+						let classEnv = new Environment(args, cenv);
+						this.evalLoop(cbody, classEnv);
+						return classEnv;
+					}
+				}
+			}
+
+			return r;
+		}));
 	}
 
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))

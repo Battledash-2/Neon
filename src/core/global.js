@@ -3,15 +3,21 @@ const LiteralConstructors = require('./literal_constructors');
 const Builtin = require('./builtin');
 
 const glbl = {
-	VER: '2.1.0', // { constant: false, value: '1.0.0', },
+	VER: '2.1.1', // { constant: false, value: '1.0.0', },
 	OS: process.platform, // { constant: true, value: process.platform, },
 
 	...Builtin,
 	...LiteralConstructors,
 
-	// Native functions
+	// ---------------------------
+	// Native
 	print(...args) { console.log(...args); return args.join(" "); },
-	isNaN(arg) { return isNaN(arg); }
+	isNaN(arg) { return isNaN(arg); },
+
+	console: {
+		clear: ()=>console.clear(),
+		log (...args){ console.log(...args); return args.join(" "); }
+	}
 };
 
 const global = new Environment({...glbl});

@@ -37,6 +37,7 @@ const tests = [
 	require('./function-return'),
 	require('./imports'),
 	require('./ternary'),
+	require('./callbacks'),
 ];
 
 const manualTests = [
