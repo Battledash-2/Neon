@@ -1,5 +1,19 @@
 const testCode = `
-true ? 'true' : 'false';
+let age = 5;
+switch(age) {
+	case 5 {
+		print("5 year old");
+		break;
+	}
+	case 2 {
+		print("2 year old");
+		break;
+	}
+	case 20 {
+		print("2*10 year old");
+		break;
+	}
+}
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');

@@ -293,6 +293,24 @@ class Interpreter {
 			return this.eval(exp.fail, env);
 		}
 
+		// Switch ... Case ...
+		if (isTypeof('SWITCH_STATEMENT')) {
+			const executeOn = this.eval(exp.handler, env);
+			let res;
+			let switchEnvironment = new Environment({}, env);
+			for (let condition of exp.statements) {
+				if (this.eval(condition.condition, env) === executeOn) {
+					let tres = this.evalLoop(condition.body, switchEnvironment);
+					if (tres instanceof Internal && tres.type === 'break') {
+						res = tres.value;
+						break;
+					};
+					res = tres.value;
+				}
+			}
+			return res;
+		}
+
 		// Break / Return
 		if (isTypeof('BREAK')) {
 			return new Internal('break', null);

@@ -38,6 +38,7 @@ const tests = [
 	require('./imports'),
 	require('./ternary'),
 	require('./callbacks'),
+	require('./switch'),
 ];
 
 const manualTests = [

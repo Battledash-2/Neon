@@ -31,6 +31,9 @@ const spec = [
 	[/^if\b/, "CONDITIONAL"],
 	[/^else\b/, "CONDITIONAL_ELSE"],
 
+	[/^switch\b/, "CONDITIONAL_SWITCH"],
+	[/^case\b/, "CONDITIONAL_CASE"],
+
 	[/^(for|while)\b/, "LOOP"],
 
 	// -- Control Flow

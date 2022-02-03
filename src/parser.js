@@ -544,6 +544,38 @@ module.exports = class Parser {
 			position: pos,
 		};
 	}
+	
+	switchStatement() {
+		const position = this.next.position;
+		this.advance('CONDITIONAL_SWITCH', 'switch');
+		
+		this.advance('LPAREN', '(');
+		let execOn = this.statement();
+		this.advance('RPAREN', ')');
+
+		let tests = [];
+
+		this.advance('LBLOCK', '{');
+		if (this.next?.type === 'RBLOCK') throw new SyntaxError(`Unexpected token '}': Expected a 'case' (${this.filename}:${position.line}:${position.cursor})`);
+		while (this.next?.type !== 'RBLOCK') {
+			this.advance('CONDITIONAL_CASE', 'case');
+			let ifCond = this.primaryStatement();
+			let body = this.blockStatement();
+			tests.push({
+				condition: ifCond,
+				body: body,
+				position: ifCond.position,
+			});
+		}
+		this.advance('RBLOCK', '}');
+
+		return {
+			type: 'SWITCH_STATEMENT',
+			handler: execOn,
+			statements: tests,
+			position,
+		};
+	}
 
 	primaryStatement() {
 		switch (this.next?.type) {
@@ -580,6 +612,8 @@ module.exports = class Parser {
 				return this.exportStatement();
 			case 'RETURN':
 				return this.returnStatement();
+			case 'CONDITIONAL_SWITCH':
+				return this.switchStatement();
 			default:
 				const r = this.next;
 				this.advance();
