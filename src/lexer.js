@@ -25,23 +25,33 @@ const spec = [
 	// ---------------------------
 	// Keywords
 	// -- Variables:
+	[/^(var|let|const)\b/, "DEFINE"],
+
+	// -- Conditions
 	[/^if\b/, "CONDITIONAL"],
 	[/^else\b/, "CONDITIONAL_ELSE"],
 
-	[/^(var|let|const)\b/, "DEFINE"],
 	[/^(for|while)\b/, "LOOP"],
 
+	// -- Control Flow
 	[/^break\b/, "BREAK"],
 	[/^return\b/, "RETURN"],
 
+	// -- Modules
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
 
+	// -- Functions
 	[/^\bfun\b/, "F_DEFINE"],
 	
+	// -- Object Oriented
 	[/^\bclass\b/, "C_DEFINE"],
 	[/^\bnew\b/, "C_CREATE"],
-	
+
+	// ---------------------------
+	// Ternary
+	[/^\?/, "QSMARK"],
+
 	// ---------------------------
 	// Functional
 	[/^("|')((?:\\\1|(?:(?!\1).))*)\1/, "STRING"],

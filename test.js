@@ -1,8 +1,5 @@
 const testCode = `
-class poo() {
-	let i = 'e'
-}
-new poo().i
+true ? 'true' : 'false';
 `; // 1+1-3
 
 const Lexer = require('./src/lexer');

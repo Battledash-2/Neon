@@ -260,6 +260,22 @@ module.exports = class Parser {
 		}
 	}
 
+	ternary(on) {
+		// on = statement
+		this.advance('QSMARK');
+		let success = this.statement();
+		this.advance('OBJ_SET');
+		let fail = this.statement();
+
+		return {
+			type: 'TERNARY',
+			condition: on,
+			success,
+			fail,
+			position: on.position,
+		};
+	}
+
 	identifier(allowFunc=true) {
 		let identifier = this.next;
 		this.advance('IDENTIFIER');
@@ -572,7 +588,12 @@ module.exports = class Parser {
 	}
 
 	statement() {
-		return this.additionExpression();
+		const stmt = this.additionExpression();
+		// console.log(this.next);
+		if (this.next?.type === 'QSMARK') {
+			return this.ternary(stmt);
+		}
+		return stmt;
 	}
 
 	statementList(endOn) {

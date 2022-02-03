@@ -36,6 +36,7 @@ const tests = [
 	require('./classes'),
 	require('./function-return'),
 	require('./imports'),
+	require('./ternary'),
 ];
 
 const manualTests = [

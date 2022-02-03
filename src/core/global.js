@@ -3,7 +3,7 @@ const LiteralConstructors = require('./literal_constructors');
 const Builtin = require('./builtin');
 
 const glbl = {
-	VER: '1.0.0', // { constant: false, value: '1.0.0', },
+	VER: '2.1.0', // { constant: false, value: '1.0.0', },
 	OS: process.platform, // { constant: true, value: process.platform, },
 
 	...Builtin,

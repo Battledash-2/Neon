@@ -276,7 +276,15 @@ class Interpreter {
 			return res;
 		}
 
-		// // Break / Return
+		// Ternary
+		if (isTypeof('TERNARY')) {
+			if (this.eval(exp.condition, env)) {
+				return this.eval(exp.success, env);
+			}
+			return this.eval(exp.fail, env);
+		}
+
+		// Break / Return
 		if (isTypeof('BREAK')) {
 			return new Internal('break', null);
 		}
