@@ -11,13 +11,16 @@ const glbl = {
 
 	// ---------------------------
 	// Native
+	// -- Console
 	print(...args) { console.log(...args); return args.join(" "); },
+	clear: ()=>console.clear(),
+
+	// -- Types
 	isNaN(arg) { return isNaN(arg); },
 
-	console: {
-		clear: ()=>console.clear(),
-		log (...args){ console.log(...args); return args.join(" "); }
-	}
+	// -- Functional
+	setTimeout(arg, time) { setTimeout(arg, time); },
+	setInterval(arg, time) { setInterval(arg, time); },
 };
 
 const global = new Environment({...glbl});
