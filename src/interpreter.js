@@ -298,8 +298,10 @@ class Interpreter {
 			const executeOn = this.eval(exp.handler, env);
 			let res;
 			let switchEnvironment = new Environment({}, env);
+			let anyPassed = false;
 			for (let condition of exp.statements) {
 				if (this.eval(condition.condition, env) === executeOn) {
+					anyPassed = true;
 					let tres = this.evalLoop(condition.body, switchEnvironment);
 					if (tres instanceof Internal && tres.type === 'break') {
 						res = tres.value;
@@ -307,6 +309,9 @@ class Interpreter {
 					};
 					res = tres.value;
 				}
+			}
+			if (!anyPassed && exp.default != null) {
+				return this.evalLoop(exp.default, switchEnvironment);
 			}
 			return res;
 		}

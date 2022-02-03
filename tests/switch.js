@@ -14,6 +14,9 @@ module.exports = test => {
 			print("2*10 year old");
 			break;
 		}
+		default {
+			print("idk")
+		}
 	}
 	`, "5 year old");
 }

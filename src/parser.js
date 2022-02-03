@@ -554,10 +554,17 @@ module.exports = class Parser {
 		this.advance('RPAREN', ')');
 
 		let tests = [];
+		let defaultExec = null;
 
 		this.advance('LBLOCK', '{');
 		if (this.next?.type === 'RBLOCK') throw new SyntaxError(`Unexpected token '}': Expected a 'case' (${this.filename}:${position.line}:${position.cursor})`);
 		while (this.next?.type !== 'RBLOCK') {
+			if (this.next?.type === 'CONDITIONAL_CASE_DEFAULT') {
+				this.advance('CONDITIONAL_CASE_DEFAULT', 'default');
+				let body = this.blockStatement();
+				defaultExec = body;
+				continue;
+			}
 			this.advance('CONDITIONAL_CASE', 'case');
 			let ifCond = this.primaryStatement();
 			let body = this.blockStatement();
@@ -573,6 +580,7 @@ module.exports = class Parser {
 			type: 'SWITCH_STATEMENT',
 			handler: execOn,
 			statements: tests,
+			default: defaultExec,
 			position,
 		};
 	}

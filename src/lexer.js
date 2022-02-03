@@ -33,6 +33,7 @@ const spec = [
 
 	[/^switch\b/, "CONDITIONAL_SWITCH"],
 	[/^case\b/, "CONDITIONAL_CASE"],
+	[/^default\b/, "CONDITIONAL_CASE_DEFAULT"],
 
 	[/^(for|while)\b/, "LOOP"],
 
