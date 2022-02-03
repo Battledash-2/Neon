@@ -33,9 +33,8 @@ const glbl = {
 		return f?.raw?.value?.env;
 	},
 	setfenv(_e, f, o) {
-		if (typeof o === 'undefined') return _e = f;
-		if (typeof f?.raw === 'undefined') return f = o;
-		return f.raw.value.env = o;
+		if (typeof o === 'undefined') return _e = new Environment(f?.record, _e);
+		return f.raw.value.env = new Environment(o?.record, f.raw.value.env);
 	}
 };
 
