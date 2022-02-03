@@ -7,7 +7,9 @@ module.exports = {
 
 			substring(from, to) {return THIS.slice(from, to);},
 			split(txt) {return THIS.split(txt);},
-			match(txt) {return THIS.match(new RegExp(txt, 'g'));}
+
+			match(txt) {return THIS.match(new RegExp(txt, 'g'));},
+			repeat(amt) {return THIS.repeat(amt);}
 		};
 	},
 	Number(THIS, env) {
@@ -24,6 +26,7 @@ module.exports = {
 			push(v) {THIS.push(v); return THIS;},
 			pop() {THIS.pop(); return THIS;},
 			splice(pos, amo) {THIS.splice(pos, amo); return THIS;},
+			join(wt=" ") {return THIS.join(wt);},
 		};
 	}
 };
