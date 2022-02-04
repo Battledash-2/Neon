@@ -39,6 +39,9 @@ const spec = [
 	// -- Control Flow
 	[/^break\b/, "BREAK"],
 	[/^return\b/, "RETURN"],
+	
+	[/^try\b/, 'TRY'],
+	[/^catch\b/, 'CATCH'],
 
 	// -- Modules
 	[/^\bimport\b/, "IMPORT"],

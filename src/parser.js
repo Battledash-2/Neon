@@ -600,6 +600,27 @@ module.exports = class Parser {
 		};
 	}
 
+	tryCatchStatement() {
+		const position = this.next.position;
+		this.advance('TRY', 'try');
+		const body = this.blockStatement();
+		this.advance('CATCH', 'catch');
+		this.advance('LPAREN', '(');
+		const id = this.identifier(false);
+		this.advance('RPAREN', ')');
+		const errorBody = this.blockStatement();
+
+		return {
+			type: 'TRY_CATCH',
+			block: body,
+			onerror: {
+				id,
+				body: errorBody,
+			},
+			position,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -637,6 +658,8 @@ module.exports = class Parser {
 				return this.returnStatement();
 			case 'CONDITIONAL_SWITCH':
 				return this.switchStatement();
+			case 'TRY':
+				return this.tryCatchStatement();
 			default:
 				const r = this.next;
 				this.advance();

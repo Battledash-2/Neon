@@ -40,6 +40,7 @@ const tests = [
 	require('./ternary'),
 	require('./callbacks'),
 	require('./switch'),
+	require('./try-catch'),
 ];
 
 const manualTests = [

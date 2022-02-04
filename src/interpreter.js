@@ -325,6 +325,16 @@ class Interpreter {
 			return res;
 		}
 
+		// Try ... Catch
+		if (isTypeof('TRY_CATCH')) {
+			try {
+				return this.evalBlock(exp.block, env);
+			} catch(e) {
+				let nenv = new Environment({ [exp.onerror.id.value]: e.message }, env);
+				return this.evalLoop(exp.onerror.body, nenv);
+			}
+		}
+
 		// Break / Return
 		if (isTypeof('BREAK')) {
 			return new Internal('break', null);
@@ -378,6 +388,7 @@ class Interpreter {
 		
 		// Native functions
 		if (typeof func === 'function') {
+			if ((/\s*function\s*[a-zA-Z0-9_$]*\(\)\s*{\s*\[\s*native code\s*\]\s*}/.exec(func.toString()))?.length != undefined) return this.handleBuiltinFunc(func, exp, env, false);
 			return this.handleBuiltinFunc(func, exp, env);
 		}
 
@@ -402,10 +413,10 @@ class Interpreter {
 		// return this.evalLoop(func.body, funcEnv, );
 	}
 
-	handleBuiltinFunc(func, exp, env) {
+	handleBuiltinFunc(func, exp, env, mode=true) {
 		let res;
 		try {
-			res = func(env, ...exp?.arguments.map(val=>{
+			let args = exp?.arguments.map(val=>{
 				let r = this.eval(val, env);
 
 				if (r?.value?.isFunction == true) {
@@ -454,7 +465,12 @@ class Interpreter {
 				}
 
 				return r;
-			}));
+			});
+			if (mode) {
+				res = func(env, ...args);
+			} else {
+				res = func(...args);
+			}
 		} catch(e) {
 			throw new e.constructor(e.message + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 		}
