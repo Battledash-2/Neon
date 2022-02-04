@@ -20,6 +20,7 @@ class Interpreter {
 	constructor(filename='runtime') {
 		this.filename = filename;
 		this.exports = {};
+		this.ids = {};
 	}
 	eval(exp, env=GlobalEnvironment, exportMode=false, preventInherit=false, stopOn) {
 		const isTypeof = t => exp?.type?.toLowerCase() === t.toLowerCase();
@@ -148,6 +149,8 @@ class Interpreter {
 			let func = new Internal('function', {
 				isClass: false,
 				isFunction: true,
+				name: fname,
+				cid: 0, // this is a function, not a class
 				arguments: args,
 				body,
 				env,
@@ -178,6 +181,8 @@ class Interpreter {
 
 			let classEnv = new Environment(args, cls.env);
 			this.evalLoop(cls.body, classEnv);
+			classEnv.name = cls.name;
+			classEnv.classID = cls.cid;
 			return classEnv;
 		}
 
@@ -190,6 +195,8 @@ class Interpreter {
 			let cls = new Internal('class', {
 				isClass: true,
 				isFunction: false,
+				name: fname,
+				cid: this.pidSys('cid'),
 				arguments: args,
 				body,
 				env: new Environment(env.record, env.parent),
@@ -515,6 +522,11 @@ class Interpreter {
 			case '!':
 				return !(this.eval(exp?.value, env));
 		}
+	}
+
+	pidSys(name) {
+		if (!this.ids.hasOwnProperty(name)) this.ids[name] = 0;
+		return ++this.ids[name];
 	}
 
 	_isNumber(exp) {

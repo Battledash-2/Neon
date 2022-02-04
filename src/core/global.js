@@ -27,6 +27,15 @@ const glbl = {
 	deleteInterval(_env, arg) { return clearInterval(arg); },
 
 	// -------------
+	// -- OOP
+	// - CLASSES
+	instanceId(_env, arg) { // not a class: -1; not a class, but a function: 0; a class: CID
+		if (!arg.hasOwnProperty('raw') && !arg.hasOwnProperty('classID')) return -1;
+		if (arg.raw && arg.raw.value.hasOwnProperty('cid')) return arg.raw.value.cid;
+		return arg.classID ?? -1;
+	},
+
+	// -------------
 	// - ENVIRONMENTS
 	getfenv(_e, f) { 
 		if (typeof f === 'undefined') return _e;
