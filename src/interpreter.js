@@ -167,7 +167,8 @@ class Interpreter {
 			let cls = this.eval(exp?.name, env);
 
 			if (typeof cls === 'function') {
-				return new cls(...(exp?.arguments?.map(c=>this.eval(c, env))))?.value;
+				let c = new cls(...(exp?.arguments?.map(c=>this.eval(c, env))));
+				return c?.value ?? new Environment(c, env);
 			}
 
 			if (!(cls instanceof Internal) || (cls?.type !== 'class' && cls?.type !== 'function')) throw new Error(`Reference item is not a class`);
