@@ -1,5 +1,5 @@
 class Environment {
-	constructor(env = {}, par = {}, con = {}) {
+	constructor(env = {}, par = null, con = {}) {
 		this.record = env;
 		this.parent = par;
 		this.constants = con;

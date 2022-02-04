@@ -7,8 +7,6 @@ const Parser = require('./parser');
 const Environment = require('./environment');
 const Constructors = require('./core/constructors');
 
-const ENVConstruct = require('./core/global');
-
 class Internal {
 	constructor(type, value) {
 		this.type = type;
@@ -405,56 +403,62 @@ class Interpreter {
 	}
 
 	handleBuiltinFunc(func, exp, env) {
-		return func(env, ...exp?.arguments.map(val=>{
-			let r = this.eval(val, env);
+		let res;
+		try {
+			res = func(env, ...exp?.arguments.map(val=>{
+				let r = this.eval(val, env);
 
-			if (r?.value?.isFunction == true) {
-				let raw = r;
-				let fargs = r.value.arguments;
-				let fenv = r.value.env;
-				let body = r.value.body;
-				r = {
-					exec: (...arg)=>{
-						let args = {};
-						for (let pos in fargs) {
-							if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-							args[fargs[pos].value] = arg[pos];
-						}
-						let funcEnv = new Environment(args, fenv);
-						let res = this.evalLoop(body, funcEnv);
-						if (res instanceof Internal && res.type === 'return') {
-							return this.eval(res.value, funcEnv);
-						}
-						return res;
-					},
-					raw,
-				}
-			}
-			if (r?.value?.isClass) {
-				let raw = r;
-				let cargs = r.value.arguments;
-				let cenv = r.value.env;
-				let cbody = r.value.body;
-				r = {
-					exec: class {
-						constructor(...arg) {
+				if (r?.value?.isFunction == true) {
+					let raw = r;
+					let fargs = r.value.arguments;
+					let fenv = r.value.env;
+					let body = r.value.body;
+					r = {
+						exec: (...arg)=>{
 							let args = {};
-							for (let pos in cargs) {
-								if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-								args[cargs[pos].value] = arg[pos];
+							for (let pos in fargs) {
+								if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+								args[fargs[pos].value] = arg[pos];
 							}
-
-							let classEnv = new Environment(args, cenv);
-							this.evalLoop(cbody, classEnv);
-							return classEnv;
-						}
-					},
-					raw,
+							let funcEnv = new Environment(args, fenv);
+							let res = this.evalLoop(body, funcEnv);
+							if (res instanceof Internal && res.type === 'return') {
+								return this.eval(res.value, funcEnv);
+							}
+							return res;
+						},
+						raw,
+					}
 				}
-			}
+				if (r?.value?.isClass) {
+					let raw = r;
+					let cargs = r.value.arguments;
+					let cenv = r.value.env;
+					let cbody = r.value.body;
+					r = {
+						exec: class {
+							constructor(...arg) {
+								let args = {};
+								for (let pos in cargs) {
+									if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+									args[cargs[pos].value] = arg[pos];
+								}
 
-			return r;
-		}));
+								let classEnv = new Environment(args, cenv);
+								this.evalLoop(cbody, classEnv);
+								return classEnv;
+							}
+						},
+						raw,
+					}
+				}
+
+				return r;
+			}));
+		} catch(e) {
+			throw new e.constructor(e.message + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+		}
+		return res;
 	}
 
 	generalAssign(exp, env) { // env.assign(exp?.name?.value, this.eval(exp?.value, env))
@@ -538,6 +542,7 @@ class Interpreter {
 	}
 }
 
+const ENVConstruct = require('./core/global')(Interpreter);
 const GlobalEnvironment = ENVConstruct.default;
 
 module.exports = Interpreter;

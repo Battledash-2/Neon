@@ -1,8 +1,9 @@
-const global = require('./src/core/global').default;
 
 const lexer = require('./src/lexer');
 const parser = require('./src/parser');
 const interpreter = require('./src/interpreter');
+
+const global = require('./src/core/global')(interpreter).default;
 
 const rl = require('readline');
 const fs = require('fs');

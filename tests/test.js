@@ -1,10 +1,11 @@
 const assert = require('assert');
 
-const env = require('../src/core/global');
 
 const Interpreter = require('../src/interpreter');
 const Lexer = require('../src/lexer');
 const Parser = require('../src/parser');
+
+const env = require('../src/core/global')(Interpreter);
 
 const interpreter = new Interpreter();
 
