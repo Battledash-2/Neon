@@ -304,10 +304,10 @@ class Interpreter {
 					anyPassed = true;
 					let tres = this.evalLoop(condition.body, switchEnvironment);
 					if (tres instanceof Internal && tres.type === 'break') {
-						res = tres.value;
+						res = tres?.value;
 						break;
 					};
-					res = tres.value;
+					res = tres?.value;
 				}
 			}
 			if (!anyPassed && exp.default != null) {

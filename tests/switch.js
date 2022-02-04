@@ -2,21 +2,17 @@ module.exports = test => {
 	test(`
 	let age = 5;
 	switch(age) {
-		case 5 {
+		case 5:
 			print("5 year old");
 			break;
-		}
-		case 2 {
+		case 2:
 			print("2 year old");
 			break;
-		}
-		case 20 {
+		case 20:
 			print("2*10 year old");
 			break;
-		}
-		default {
+		default:
 			print("idk")
-		}
 	}
 	`, "5 year old");
 }

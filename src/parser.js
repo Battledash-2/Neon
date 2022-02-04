@@ -558,29 +558,42 @@ module.exports = class Parser {
 
 		this.advance('LBLOCK', '{');
 		if (this.next?.type === 'RBLOCK') throw new SyntaxError(`Unexpected token '}': Expected a 'case' (${this.filename}:${position.line}:${position.cursor})`);
+		
 		while (this.next?.type !== 'RBLOCK') {
-			if (this.next?.type === 'CONDITIONAL_CASE_DEFAULT') {
-				this.advance('CONDITIONAL_CASE_DEFAULT', 'default');
-				let body = this.blockStatement();
-				defaultExec = body;
+			if (this.next == null || this.next?.type !== 'CONDITIONAL_CASE') throw new SyntaxError(`Expected 'case' or 'default' (${this.filename}:${position.line}:${position.cursor})`);
+			if (this.next?.value === 'default') {
+				if (defaultExec !== null) throw new SyntaxError(`Saw multiple 'default' statements inside of switch case (${this.filename}:${position.line}:${position.cursor})`);
+				this.advance('CONDITIONAL_CASE', 'default');
+				this.advance('OBJ_SET', ':');
+				let res = [];
+				while (this.next !== null && (this.next.type !== 'CONDITIONAL_CASE' && this.next.type !== 'RBLOCK')) {
+					res.push(this.statement());
+					if (this.next?.type === 'EXPR_END') this.advance('EXPR_END', ';');
+				}
+				defaultExec = res;
 				continue;
 			}
 			this.advance('CONDITIONAL_CASE', 'case');
-			let ifCond = this.primaryStatement();
-			let body = this.blockStatement();
+			let test = this.primaryStatement();
+			this.advance('OBJ_SET', ':');
+			let res = [];
+			while (this.next !== null && (this.next.type !== 'CONDITIONAL_CASE' && this.next.type !== 'RBLOCK')) {
+				res.push(this.statement());
+				if (this.next?.type === 'EXPR_END') this.advance('EXPR_END', ';');
+			}
 			tests.push({
-				condition: ifCond,
-				body: body,
-				position: ifCond.position,
+				condition: test,
+				body: { type: 'BLOCK', body: res },
 			});
 		}
+		
 		this.advance('RBLOCK', '}');
 
 		return {
 			type: 'SWITCH_STATEMENT',
 			handler: execOn,
 			statements: tests,
-			default: defaultExec,
+			default: { type: 'BLOCK', body: defaultExec },
 			position,
 		};
 	}
