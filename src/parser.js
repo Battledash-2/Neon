@@ -217,6 +217,8 @@ module.exports = class Parser {
 			return this.functionCall(name);
 		} else if (this.next?.type === 'OBJ_SEPERATOR') {
 			return this.linked(name);
+		} else if (this.next?.type === 'LBRACK') {
+			return this.arraySelect(name);
 		}
 
 		return name;
