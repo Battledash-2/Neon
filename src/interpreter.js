@@ -249,7 +249,8 @@ class Interpreter {
 		if (isTypeof('IMPORT')) {
 			// throw 'unimplemented';
 			let file  = exp.file.value;
-			let fname = path.parse(file).name;
+			let jsf = file.replace(/\\/g, '/').split('/');
+			jsf[jsf.length-1] = jsf[jsf.length-1]+'.js';
 
 			let fcontent;
 
@@ -258,8 +259,8 @@ class Interpreter {
 				return renv;
 			} else if (fs.existsSync(path.join(process.cwd(), file))) {
 				fcontent = fs.readFileSync(path.join(process.cwd(), file));
-			} else if (fs.existsSync(path.join(__dirname, 'core', 'modules', fname+'.js'))) {
-				const renv = require(path.join(__dirname, 'core', 'modules', fname+'.js'));
+			} else if (fs.existsSync(path.join(__dirname, 'core', 'modules', ...jsf))) {
+				const renv = require(path.join(__dirname, 'core', 'modules', ...jsf));
 				return renv;
 			} else if (fs.existsSync(path.join(process.cwd(), '.modules', file))) {
 				fcontent = fs.readFileSync(path.join(process.cwd(), '.modules', file));

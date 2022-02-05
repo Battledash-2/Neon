@@ -10,7 +10,7 @@ module.exports = (Interpreter) => {
 
 	const glbl = {
 		VER: '2.1.1', // { constant: false, value: '1.0.0', },
-		OS: process.platform, // { constant: true, value: process.platform, },
+		PLATFORM: process.platform, // { constant: true, value: process.platform, },
 
 		...Builtin,
 		...LiteralConstructors,
