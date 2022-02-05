@@ -28,5 +28,11 @@ module.exports = {
 			splice(_e,pos, amo) {THIS.splice(pos, amo); return THIS;},
 			join(_e,wt=" ") {return THIS.join(wt);},
 		};
+	},
+	Function(THIS, env) {
+		return {
+			name: THIS?.value?.name ?? THIS.name,
+			isNative: typeof THIS === 'function',
+		};
 	}
 };

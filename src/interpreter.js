@@ -116,6 +116,9 @@ class Interpreter {
 		if (isTypeof('LINKED')) {
 			let to = this.eval(exp?.with, env, false, preventInherit);
 
+			// Instanceof internal ...
+			if ((to instanceof Internal && to.type === 'function' && to?.value?.isFunction) || typeof to === 'function') to = Constructors.Function(to, env);
+			
 			if (to instanceof Internal) throw new ReferenceError(`Cannot read properties from internal objects (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 
 			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to, env);
