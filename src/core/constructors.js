@@ -5,7 +5,7 @@ module.exports = {
 			number: Number(THIS),
 			length: Number(THIS.length),
 
-			substring(f_e,rom, to) {return THIS.slice(from, to);},
+			substring(_e, from, to) {return THIS.slice(from, to);},
 			split(_e,txt) {return THIS.split(txt);},
 
 			match(_e,txt) {return THIS.match(new RegExp(txt, 'g'));},

@@ -25,8 +25,8 @@ class Interpreter {
 		if (exp == null
 			|| typeof exp === 'number'
 			|| typeof exp === 'string'
-			|| typeof exp === 'boolean') return exp;
-		if (Array.isArray(exp)) return exp;
+			|| typeof exp === 'boolean'
+			|| Array.isArray(exp)) return exp;
 
 		this.pos = {
 			...(exp?.position ?? {line: 1, cursor: 1}),
@@ -424,21 +424,26 @@ class Interpreter {
 					let fargs = r.value.arguments;
 					let fenv = r.value.env;
 					let body = r.value.body;
-					r = {
-						exec: (...arg)=>{
-							let args = {};
-							for (let pos in fargs) {
-								if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-								args[fargs[pos].value] = arg[pos];
-							}
-							let funcEnv = new Environment(args, fenv);
-							let res = this.evalLoop(body, funcEnv);
-							if (res instanceof Internal && res.type === 'return') {
-								return this.eval(res.value, funcEnv);
-							}
-							return res;
-						},
-						raw,
+					let l = (...arg)=>{
+						let args = {};
+						for (let pos in fargs) {
+							if (fargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+							args[fargs[pos].value] = arg[pos];
+						}
+						let funcEnv = new Environment(args, fenv);
+						let res = this.evalLoop(body, funcEnv);
+						if (res instanceof Internal && res.type === 'return') {
+							return this.eval(res.value, funcEnv);
+						}
+						return res;
+					};
+					if (mode) {
+						r = {
+							exec: l,
+							raw,
+						}
+					} else {
+						r = l;
 					}
 				}
 				if (r?.value?.isClass) {
@@ -446,21 +451,26 @@ class Interpreter {
 					let cargs = r.value.arguments;
 					let cenv = r.value.env;
 					let cbody = r.value.body;
-					r = {
-						exec: class {
-							constructor(...arg) {
-								let args = {};
-								for (let pos in cargs) {
-									if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
-									args[cargs[pos].value] = arg[pos];
-								}
-
-								let classEnv = new Environment(args, cenv);
-								this.evalLoop(cbody, classEnv);
-								return classEnv;
+					let l = class {
+						constructor(...arg) {
+							let args = {};
+							for (let pos in cargs) {
+								if (cargs[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
+								args[cargs[pos].value] = arg[pos];
 							}
-						},
-						raw,
+
+							let classEnv = new Environment(args, cenv);
+							this.evalLoop(cbody, classEnv);
+							return classEnv;
+						}
+					};
+					if (mode) {
+						r = {
+							exec: l,
+							raw,
+						}
+					} else {
+						r = l;
 					}
 				}
 
