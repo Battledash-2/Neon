@@ -338,6 +338,13 @@ class Interpreter {
 				return this.evalLoop(exp.onerror.body, nenv);
 			}
 		}
+		
+		// With ... ...
+		if (isTypeof('WITH_STATEMENT')) {
+			const urenv = this.eval(exp.env, env);
+			const renv  = new Environment({...(urenv instanceof Environment ? urenv.record : urenv)}, env);
+			return this.evalLoop(exp.block, renv);
+		}
 
 		// Break / Return
 		if (isTypeof('BREAK')) {

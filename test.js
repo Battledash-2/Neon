@@ -1,8 +1,6 @@
 const testCode = `
-try {
-	poo
-} catch(error) {
-	print("EO", error);
+with(obj) {
+	poop
 }
 `; // 1+1-3
 

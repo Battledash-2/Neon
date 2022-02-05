@@ -621,6 +621,24 @@ module.exports = class Parser {
 		};
 	}
 
+	withStatement() {
+		const position = this.next.position;
+		this.advance('WITH', 'with');
+		
+		this.advance('LPAREN', '(');
+		const env = this.identifier();
+		this.advance('RPAREN', ')');
+
+		const block = this.blockStatement();
+
+		return {
+			type: 'WITH_STATEMENT',
+			env,
+			block,
+			position,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -660,6 +678,8 @@ module.exports = class Parser {
 				return this.switchStatement();
 			case 'TRY':
 				return this.tryCatchStatement();
+			case 'WITH':
+				return this.withStatement();
 			default:
 				const r = this.next;
 				this.advance();

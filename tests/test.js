@@ -41,6 +41,7 @@ const tests = [
 	require('./callbacks'),
 	require('./switch'),
 	require('./try-catch'),
+	require('./with-statement'),
 ];
 
 const manualTests = [

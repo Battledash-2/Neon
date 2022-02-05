@@ -43,6 +43,8 @@ const spec = [
 	[/^try\b/, 'TRY'],
 	[/^catch\b/, 'CATCH'],
 
+	[/^with\b/, 'WITH'],
+
 	// -- Modules
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],
