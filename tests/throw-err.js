@@ -3,7 +3,7 @@ module.exports = test => {
 	try {
 		throw "dsad";
 	} catch(e) {
-		print("ERROR:", e);
+		print(e);
 	}
-	`, "ERROR: dsad (runtime:2:7)");
+	`, "[Error]: dsad (runtime:2:7)");
 }

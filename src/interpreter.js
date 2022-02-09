@@ -348,7 +348,7 @@ class Interpreter {
 
 		// Throw
 		if (isTypeof('THROW_ERROR')) {
-			throw new Error(this.eval(exp.message) + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+			throw new Error('[Error]: ' + this.eval(exp.message) + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 		}
 
 		// Break / Return
