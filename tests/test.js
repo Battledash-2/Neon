@@ -42,6 +42,7 @@ const tests = [
 	require('./switch'),
 	require('./try-catch'),
 	require('./with-statement'),
+	require('./throw-err'),
 ];
 
 const manualTests = [

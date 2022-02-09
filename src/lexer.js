@@ -45,6 +45,8 @@ const spec = [
 
 	[/^with\b/, 'WITH'],
 
+	[/^throw\b/, 'THROW_ERR'],
+
 	// -- Modules
 	[/^\bimport\b/, "IMPORT"],
 	[/^\bexport\b/, "EXPORT"],

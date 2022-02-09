@@ -639,6 +639,17 @@ module.exports = class Parser {
 		};
 	}
 
+	errorStatement() {
+		let position = this.next.position;
+		this.advance('THROW_ERR', 'throw');
+		let message = this.statement();
+		return {
+			type: 'THROW_ERROR',
+			message,
+			position,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -680,6 +691,8 @@ module.exports = class Parser {
 				return this.tryCatchStatement();
 			case 'WITH':
 				return this.withStatement();
+			case 'THROW_ERR':
+				return this.errorStatement();
 			default:
 				const r = this.next;
 				this.advance();

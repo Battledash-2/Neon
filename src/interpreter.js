@@ -346,6 +346,11 @@ class Interpreter {
 			return this.evalLoop(exp.block, renv);
 		}
 
+		// Throw
+		if (isTypeof('THROW_ERROR')) {
+			throw new Error(this.eval(exp.message) + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+		}
+
 		// Break / Return
 		if (isTypeof('BREAK')) {
 			return new Internal('break', null);
