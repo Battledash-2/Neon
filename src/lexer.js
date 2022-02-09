@@ -46,6 +46,7 @@ const spec = [
 	[/^with\b/, 'WITH'],
 
 	[/^throw\b/, 'THROW_ERR'],
+	[/^typeof\b/, 'TYPEOF'],
 
 	// -- Modules
 	[/^\bimport\b/, "IMPORT"],

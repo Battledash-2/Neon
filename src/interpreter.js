@@ -346,9 +346,33 @@ class Interpreter {
 			return this.evalLoop(exp.block, renv);
 		}
 
-		// Throw
+		// ... <obj>
 		if (isTypeof('THROW_ERROR')) {
 			throw new Error('[Error]: ' + this.eval(exp.message) + ` (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
+		}
+		if (isTypeof('TYPEOF_OBJ')) {
+			let object = this.eval(exp.object);
+			
+			if (object instanceof Internal) return object.type.toLowerCase();
+			if (object instanceof Environment) return 'object';
+
+			if (typeof object === 'undefined' || object == null) return 'undefined';
+
+			let type = typeof object;
+
+			
+			if (type === 'object' && Array.isArray(object)) return 'array';
+			if (type === 'object') return 'object';
+
+			if (type === 'function') return 'internal_function';
+
+
+			if (type === 'undefined'
+				|| type === 'number'
+				|| type === 'string'
+				|| type === 'boolean') return type;
+
+			return false;
 		}
 
 		// Break / Return
@@ -404,7 +428,7 @@ class Interpreter {
 		
 		// Native functions
 		if (typeof func === 'function') {
-			if ((/\s*function\s*[a-zA-Z0-9_$]*\(\)\s*{\s*\[\s*native code\s*\]\s*}/.exec(func.toString()))?.length != undefined) return this.handleBuiltinFunc(func, exp, env, false);
+			if ((/\s*(function)?\s*[a-zA-Z0-9_$]+\(_e.*?\)/.exec(func.toString()))?.length == null) return this.handleBuiltinFunc(func, exp, env, false);
 			return this.handleBuiltinFunc(func, exp, env);
 		}
 

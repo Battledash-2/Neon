@@ -650,6 +650,17 @@ module.exports = class Parser {
 		};
 	}
 
+	typeofStatement() {
+		let position = this.next.position;
+		this.advance('TYPEOF', 'typeof');
+		let object = this.statement();
+		return {
+			type: 'TYPEOF_OBJ',
+			object,
+			position,
+		};
+	}
+
 	primaryStatement() {
 		switch (this.next?.type) {
 			case 'EXPR_END':
@@ -693,6 +704,8 @@ module.exports = class Parser {
 				return this.withStatement();
 			case 'THROW_ERR':
 				return this.errorStatement();
+			case 'TYPEOF':
+				return this.typeofStatement();
 			default:
 				const r = this.next;
 				this.advance();

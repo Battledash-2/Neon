@@ -1,17 +1,20 @@
 class Environment {
-	constructor(env = {}, par = null, con = {}) {
+	constructor(env = {}, par = null, con = {}, locked = false) {
 		this.record = env;
 		this.parent = par;
 		this.constants = con;
+		this.locked = locked ?? false;
 	}
 
 	define(name, value, _pos, constant) {
+		if (this.locked) return false;
 		this.record[name] = value;
 		if (constant) {this.constants[name] = constant;}
 		return value;
 	}
 
 	_assign(name, value, pos) {
+		if (this.locked) return false;
 		let env = this.resolve(name, pos);
 		if (this.isConstant(name, pos)) throw new TypeError(`Cannot overwrite constant variable '${name}' (${pos.filename}:${pos.line}:${pos.cursor})`);
 		env.record[name] = value;
@@ -19,6 +22,7 @@ class Environment {
 	}
 
 	assign(name, value, pos) {
+		if (this.locked) return false;
 		if (this.varExists(name)) return this._assign(name, value, pos);
 		return this.define(name, value, pos, false);
 	}
