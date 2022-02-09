@@ -118,7 +118,7 @@ class Interpreter {
 
 			// Instanceof internal ...
 			if ((to instanceof Internal && to.type === 'function' && to?.value?.isFunction) || typeof to === 'function') to = Constructors.Function(to, env);
-			
+
 			if (to instanceof Internal) throw new ReferenceError(`Cannot read properties from internal objects (${this.filename}:${this.pos.line}:${this.pos.cursor})`);
 
 			if (exp.with?.type === 'STRING' || typeof to === 'string') to = Constructors.String(to, env);
@@ -441,6 +441,7 @@ class Interpreter {
 			if (func.arguments[pos].type !== 'IDENTIFIER') throw new TypeError(`Expected all arguments to be identifiers in function call to '${exp?.name?.value}'`);
 			args[func.arguments[pos].value] = this.eval(exp?.arguments[pos], env);
 		}
+		args.arguments = exp?.arguments.map(i=>this.eval(i, env));
 
 		// let funcEnv = new Environment(args, env);
 		let funcEnv = new Environment(args, func.env);

@@ -5,11 +5,14 @@ module.exports = {
 			number: Number(THIS),
 			length: Number(THIS.length),
 
-			substring(_e, from, to) {return THIS.slice(from, to);},
-			split(_e,txt) {return THIS.split(txt);},
+			substring(_e, from, to) { return THIS.slice(from, to); },
+			split(_e,txt) { return THIS.split(txt); },
 
-			match(_e,txt) {return THIS.match(new RegExp(txt, 'g'));},
-			repeat(_e,amt) {return THIS.repeat(amt);}
+			match(_e,txt) { return THIS.match(new RegExp(txt, 'g')); },
+			repeat(_e,amt) { return THIS.repeat(amt); },
+
+			charAt(at) { return THIS.charAt(at); },
+			charCodeAt(at) { return THIS.charCodeAt(at); }
 		};
 	},
 	Number(THIS, env) {
@@ -27,6 +30,14 @@ module.exports = {
 			pop() {THIS.pop(); return THIS;},
 			splice(_e,pos, amo) {THIS.splice(pos, amo); return THIS;},
 			join(_e,wt=" ") {return THIS.join(wt);},
+
+			map(cb) {
+				let res = [...THIS];
+				for (let i in res) {
+					res[i] = cb(res[i]);
+				}
+				return res;
+			},
 		};
 	},
 	Function(THIS, env) {

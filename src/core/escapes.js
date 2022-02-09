@@ -4,6 +4,9 @@ const esc = [
 
 	[/\\("|')/, "$1"],
 
+	[/\\u[a-zA-Z0-9]{4}/, match=>String.fromCharCode(parseInt(match.slice('\\u'.length), 16))],
+	[/\\x[a-zA-Z0-9]{2}/, match=>String.fromCharCode(parseInt(match.slice('\\x'.length), 16))],
+
 	[/\\\\/, "\\"],
 ];
 
